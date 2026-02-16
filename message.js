@@ -5,6 +5,7 @@ import {
   db,
   collection,
   addDoc,
+  getDocs,
   onSnapshot,
   serverTimestamp,
   orderBy,
@@ -16,8 +17,10 @@ import {
 } from "./app.js";
 
 const logoutBtn = document.getElementById("logout-btn");
+const contactsListEl = document.getElementById("contacts-list");
 const convListEl = document.getElementById("conv-list");
-const chatTargetEl = document.getElementById("chat-target");
+const chatTargetNameEl = document.getElementById("chat-target-name");
+const chatTargetSubEl = document.getElementById("chat-target-sub");
 const form = document.getElementById("message-form");
 const input = document.getElementById("message-input");
 const messagesEl = document.getElementById("messages-list");
@@ -31,9 +34,18 @@ let currentTargetPhone = null;
 let unsubscribeConv = null;
 let unsubscribeConvList = null;
 
-/* -----------------------------
-   RENDER MESSAGES
------------------------------ */
+/* ---------- UI HELPERS ---------- */
+
+function setNoConversation() {
+  currentConvId = null;
+  currentTargetPhone = null;
+  chatTargetNameEl.textContent = "Aucune conversation";
+  chatTargetSubEl.textContent = "Sélectionne un contact ou crée une discussion";
+  messagesEl.innerHTML = "";
+}
+
+/* ---------- RENDER MESSAGES ---------- */
+
 function renderMessages(messages) {
   messagesEl.innerHTML = "";
   messages.forEach((m) => {
@@ -61,16 +73,15 @@ function renderMessages(messages) {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-/* -----------------------------
-   RENDER CONVERSATIONS LIST
------------------------------ */
+/* ---------- RENDER CONVERSATIONS LIST ---------- */
+
 function renderConversationsList(convs) {
   convListEl.innerHTML = "";
   convs.forEach((c) => {
     const div = document.createElement("div");
-    div.className = "conv-item" + (c.conversationId === currentConvId ? " active" : "");
+    div.className = "list-item" + (c.conversationId === currentConvId ? " active" : "");
 
-    const badge = c.unread ? `<span class="conv-badge">●</span>` : "";
+    const badge = c.unread ? `<span class="badge">●</span>` : "";
 
     const time = c.lastTimestamp?.toDate
       ? c.lastTimestamp.toDate().toLocaleTimeString("fr-FR", {
@@ -80,11 +91,11 @@ function renderConversationsList(convs) {
       : "";
 
     div.innerHTML = `
-      <div class="conv-main">
-        <div class="conv-phone">${c.otherPhone} ${badge}</div>
-        <div class="conv-last">${c.lastMessage}</div>
+      <div class="item-main">
+        <div class="item-title">${c.otherPhone} ${badge}</div>
+        <div class="item-sub">${c.lastMessage || ""}</div>
       </div>
-      <div class="conv-meta">${time}</div>
+      <div class="item-meta">${time}</div>
     `;
 
     div.addEventListener("click", () => {
@@ -95,9 +106,37 @@ function renderConversationsList(convs) {
   });
 }
 
-/* -----------------------------
-   SUBSCRIBE TO CONVERSATIONS
------------------------------ */
+/* ---------- LOAD CONTACTS ---------- */
+
+async function loadContacts() {
+  const colRef = collection(db, "contacts", currentUser.uid, "list");
+  const snap = await getDocs(colRef);
+
+  contactsListEl.innerHTML = "";
+
+  snap.forEach((docSnap) => {
+    const c = docSnap.data();
+
+    const div = document.createElement("div");
+    div.className = "list-item";
+
+    div.innerHTML = `
+      <div class="item-main">
+        <div class="item-title">${c.name || "Contact"}</div>
+        <div class="item-sub">${c.number}</div>
+      </div>
+    `;
+
+    div.addEventListener("click", () => {
+      openConversation(c.number);
+    });
+
+    contactsListEl.appendChild(div);
+  });
+}
+
+/* ---------- SUBSCRIPTIONS ---------- */
+
 function subscribeToConversation(convId) {
   if (unsubscribeConv) unsubscribeConv();
 
@@ -126,12 +165,12 @@ function subscribeToConversationList() {
   });
 }
 
-/* -----------------------------
-   OPEN CONVERSATION
------------------------------ */
+/* ---------- OPEN CONVERSATION ---------- */
+
 async function openConversation(otherPhone, convId = null) {
   currentTargetPhone = otherPhone;
-  chatTargetEl.textContent = otherPhone;
+  chatTargetNameEl.textContent = otherPhone;
+  chatTargetSubEl.textContent = "Conversation active";
 
   if (!convId) {
     const targetUser = await getUserByPhoneNumber(otherPhone);
@@ -159,9 +198,8 @@ async function openConversation(otherPhone, convId = null) {
   subscribeToConversation(convId);
 }
 
-/* -----------------------------
-   SEND MESSAGE
------------------------------ */
+/* ---------- SEND MESSAGE ---------- */
+
 async function sendMessage() {
   const text = input.value.trim();
   if (!text || !currentTargetPhone) return;
@@ -199,28 +237,29 @@ async function sendMessage() {
   input.value = "";
 }
 
-/* -----------------------------
-   NEW CHAT BUTTON
------------------------------ */
+/* ---------- NEW CHAT BUTTON ---------- */
+
 newChatBtn.addEventListener("click", async () => {
   const number = prompt("Numéro Phone® du destinataire (XX-XX-XX-XX-XX) :");
   if (!number) return;
   openConversation(number);
 });
 
-/* -----------------------------
-   EVENTS
------------------------------ */
+/* ---------- EVENTS ---------- */
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   sendMessage();
 });
 
-/* -----------------------------
-   INIT
------------------------------ */
+logoutBtn.addEventListener("click", () => logout());
+
+/* ---------- INIT ---------- */
+
 checkAuth().then(({ user, phoneNumber }) => {
   currentUser = user;
   myPhone = phoneNumber;
+  setNoConversation();
+  loadContacts();
   subscribeToConversationList();
 });

@@ -1,322 +1,259 @@
-/* ------------------------------
-   RESET & BASE
------------------------------- */
-
+/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-  background: #fafafa;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #f5f5f7;
   color: #111;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ------------------------------
-   LAYOUT GLOBAL
------------------------------- */
-
-.app-shell {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 80px 20px 20px;
-}
-
-/* ------------------------------
-   HEADER (style Instagram)
------------------------------- */
-
-header {
+/* TOPBAR */
+.topbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  background: #fff;
-  border-bottom: 1px solid #dbdbdb;
+  height: 56px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e2e7;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 22px;
-  z-index: 100;
+  padding: 0 20px;
+  z-index: 10;
 }
 
-header .brand-title {
-  font-size: 1.4rem;
+.topbar-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  font-size: 1.3rem;
   font-weight: 600;
 }
 
-header .brand-sub {
+.logo-sub {
   font-size: 0.75rem;
   color: #888;
 }
 
-.logout-btn {
+.topbar-btn {
+  border: none;
   background: none;
-  border: none;
-  font-size: 0.9rem;
-  color: #0095f6;
+  color: #007aff;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 600;
 }
 
-/* ------------------------------
-   CARDS (style Instagram)
------------------------------- */
-
-.card {
-  background: #fff;
-  border: 1px solid #dbdbdb;
-  border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 20px;
+/* LAYOUT */
+.app-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 76px 16px 16px;
 }
-
-.card-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #222;
-}
-
-/* ------------------------------
-   FORMULAIRES
------------------------------- */
-
-label {
-  font-size: 0.85rem;
-  color: #555;
-  margin-bottom: 4px;
-  display: block;
-}
-
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #dbdbdb;
-  background: #fafafa;
-  font-size: 0.95rem;
-  outline: none;
-  transition: border 0.2s ease;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #0095f6;
-  background: #fff;
-}
-
-.btn {
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.btn-primary {
-  background: #0095f6;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: #007cd1;
-}
-
-/* ------------------------------
-   CONTACTS / LISTES
------------------------------- */
-
-.contacts-list,
-.history-list,
-.calls-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.contact-item,
-.call-item {
-  background: #fff;
-  border: 1px solid #dbdbdb;
-  padding: 12px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.contact-name {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.contact-number {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-/* ------------------------------
-   MESSAGERIE (style Instagram DM)
------------------------------- */
 
 .messaging-layout {
-  display: flex;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
   height: calc(100vh - 100px);
 }
 
-/* Panneau gauche */
-.conv-panel {
-  width: 32%;
-  background: #fff;
-  border: 1px solid #dbdbdb;
-  border-radius: 12px;
+/* SIDEBAR */
+.sidebar {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e2e7;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-section + .sidebar-section {
+  border-top: 1px solid #f0f0f3;
+}
+
+.sidebar-header {
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #777;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  color: #007aff;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.list {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+/* LIST ITEMS */
+.list-item {
+  padding: 10px 14px;
+  border-top: 1px solid #f5f5f7;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.list-item:hover {
+  background: #f7f7fa;
+}
+
+.list-item.active {
+  background: #e8f0ff;
+}
+
+.item-main {
   display: flex;
   flex-direction: column;
 }
 
-.conv-header {
-  padding: 14px;
-  border-bottom: 1px solid #dbdbdb;
-  font-size: 0.85rem;
+.item-title {
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #555;
 }
 
-.conv-list {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.conv-item {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  transition: background 0.15s ease;
-}
-
-.conv-item:hover {
-  background: #fafafa;
-}
-
-.conv-item.active {
-  background: #e8f3ff;
-}
-
-.conv-phone {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.conv-last {
+.item-sub {
   font-size: 0.8rem;
   color: #777;
 }
 
-.conv-meta {
+.item-meta {
   font-size: 0.75rem;
   color: #999;
 }
 
-.conv-badge {
-  color: #0095f6;
+.badge {
+  color: #ff3b30;
   font-size: 0.8rem;
+  margin-left: 4px;
 }
 
-/* Panneau droit */
-.chat-panel {
-  flex: 1;
-  background: #fff;
-  border: 1px solid #dbdbdb;
-  border-radius: 12px;
+/* CHAT */
+.chat {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e2e7;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .chat-header {
-  padding: 14px;
-  border-bottom: 1px solid #dbdbdb;
-  font-size: 0.9rem;
-  color: #555;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f3;
+  display: flex;
+  align-items: center;
 }
 
-.chat-header span {
+.chat-target-name {
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #111;
 }
 
+.chat-target-sub {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+/* MESSAGES */
 .chat-messages {
   flex: 1;
-  padding: 14px;
+  padding: 12px 16px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
-/* Messages */
 .message-bubble {
   max-width: 70%;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 18px;
   font-size: 0.9rem;
   line-height: 1.4;
 }
 
 .message-bubble.other {
-  background: #f1f1f1;
+  background: #f1f1f4;
   align-self: flex-start;
 }
 
 .message-bubble.me {
-  background: #0095f6;
+  background: #007aff;
   color: #fff;
   align-self: flex-end;
 }
 
 .message-meta {
-  margin-top: 4px;
+  margin-top: 3px;
   font-size: 0.7rem;
   opacity: 0.7;
 }
 
-/* Input */
+/* INPUT */
 .chat-input-row {
-  padding: 12px;
-  border-top: 1px solid #dbdbdb;
+  padding: 10px 12px;
+  border-top: 1px solid #f0f0f3;
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .chat-input-row input {
   flex: 1;
-  border-radius: 20px;
-  background: #fafafa;
+  border-radius: 999px;
+  border: 1px solid #d0d0d7;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  outline: none;
+  background: #f9f9fb;
 }
 
-/* ------------------------------
-   RESPONSIVE
------------------------------- */
+.chat-input-row input:focus {
+  border-color: #007aff;
+  background: #ffffff;
+}
 
+.btn-primary {
+  border-radius: 999px;
+  border: none;
+  padding: 8px 16px;
+  background: #007aff;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* RESPONSIVE */
 @media (max-width: 900px) {
   .messaging-layout {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    height: auto;
   }
-  .conv-panel {
-    width: 100%;
-    height: 40%;
+  .sidebar {
+    max-height: 40vh;
   }
-  .chat-panel {
-    height: 60%;
+  .chat {
+    height: 60vh;
   }
 }

@@ -6,7 +6,6 @@ import {
 import {
   getAuth,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -79,7 +78,6 @@ export function checkAuth() {
   return new Promise(resolve => {
     onAuthStateChanged(auth, async user => {
       if (!user) {
-        // pour tester vite : on crée un compte auto si pas connecté
         const email = `test${Math.floor(Math.random() * 100000)}@mail.com`;
         const password = "password123";
         const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -97,7 +95,8 @@ export function logout() {
   return signOut(auth);
 }
 
-// Récupérer un user par numéro Phone®
+// ---------- HELPERS MESSAGERIE ----------
+
 export async function getUserByPhoneNumber(phoneNumber) {
   const qUsers = query(collection(db, "users"), where("phoneNumber", "==", phoneNumber));
   const snap = await getDocs(qUsers);
@@ -106,7 +105,6 @@ export async function getUserByPhoneNumber(phoneNumber) {
   return { uid: docSnap.id, ...docSnap.data() };
 }
 
-// Trouver ou créer une conversation entre deux numéros
 export async function getOrCreateConversation(phoneA, phoneB) {
   const convRef = collection(db, "conversations");
   const qConv = query(
@@ -129,7 +127,6 @@ export async function getOrCreateConversation(phoneA, phoneB) {
   return newConv.id;
 }
 
-// Mettre à jour la vue "userConversations" pour un user
 export async function updateUserConversation(uid, myPhone, otherPhone, convId, lastText, unread = true) {
   const userConvRef = collection(db, "userConversations", uid, "list");
   const q = query(userConvRef, where("conversationId", "==", convId));
@@ -158,7 +155,6 @@ export async function updateUserConversation(uid, myPhone, otherPhone, convId, l
   }
 }
 
-// Marquer une conversation comme lue pour un user
 export async function markConversationRead(uid, convId) {
   const userConvRef = collection(db, "userConversations", uid, "list");
   const q = query(userConvRef, where("conversationId", "==", convId));
@@ -172,7 +168,6 @@ export async function markConversationRead(uid, convId) {
   );
 }
 
-// EXPORT FIRESTORE
 export {
   auth,
   db,
