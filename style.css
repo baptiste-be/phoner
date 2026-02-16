@@ -1,256 +1,75 @@
-/* style.css */
+/* Améliorations responsive supplémentaires */
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-body.dark-body {
-  background: radial-gradient(circle at top, #222 0, #000 60%);
-  color: #f5f5f5;
-  min-height: 100vh;
-}
-
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: rgba(10, 10, 10, 0.9);
-  backdrop-filter: blur(16px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  z-index: 10;
-}
-
-.header h1 {
-  font-size: 20px;
-}
-
-.header-nav {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.main {
-  padding-top: 70px;
-  padding-bottom: 16px;
+/* Empêche les débordements horizontaux */
+html, body {
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
+  overflow-x: hidden;
 }
 
-.center-main {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 60px);
-}
-
-.auth-box {
-  width: 100%;
-  max-width: 400px;
-  background: rgba(20, 20, 20, 0.8);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.auth-box h2 {
-  margin-bottom: 16px;
-  font-size: 22px;
-}
-
-.form-group {
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-group label {
-  font-size: 14px;
-  color: #ccc;
-}
-
-.form-group input,
-.form-group select {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
-  padding: 10px 14px;
-  color: #f5f5f5;
-  outline: none;
-  transition: border 0.2s, background 0.2s;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  border-color: rgba(0, 150, 255, 0.8);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.btn-primary,
-.btn-secondary,
-.link-button {
-  border-radius: 999px;
-  padding: 10px 18px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #007aff, #00c6ff);
-  color: #fff;
-  width: 100%;
-  margin-top: 8px;
-  box-shadow: 0 10px 30px rgba(0, 122, 255, 0.4);
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 40px rgba(0, 122, 255, 0.6);
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
-  color: #f5f5f5;
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.link-button {
-  background: transparent;
-  color: #8ab4ff;
-  text-decoration: underline;
-  margin-top: 8px;
-  width: 100%;
-}
-
-.error-box {
-  min-height: 18px;
-  font-size: 13px;
-  color: #ff6b6b;
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
-/* Menu index */
-
-.menu {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.menu-item {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 16px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #f5f5f5;
-  text-decoration: none;
-  font-size: 14px;
-  transition: background 0.2s, transform 0.1s;
-}
-
-.menu-item:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-1px);
-}
-
-/* Sections */
-
-.form-section,
-.list-section {
-  background: rgba(20, 20, 20, 0.8);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.list {
-  list-style: none;
-  margin-top: 8px;
-}
-
-.list-item {
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(40, 40, 40, 0.9), rgba(15, 15, 15, 0.9));
-  margin-bottom: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-/* Chat */
-
-.chat-main {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 60px);
-  max-width: 700px;
-}
-
-.message-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
+/* Messages : bulles adaptatives */
 .message-item {
-  align-self: flex-start;
-  max-width: 80%;
-  padding: 8px 12px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #1f2933, #111827);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 14px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
-.chat-input-bar {
-  display: flex;
-  gap: 8px;
-  padding: 8px 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(10, 10, 10, 0.95);
+/* Inputs : taille adaptée sur mobile */
+input, select, button {
+  font-size: 16px; /* évite le zoom automatique iOS */
 }
 
-.chat-input-bar input {
-  flex: 1;
+/* Chat : meilleure gestion sur petits écrans */
+@media (max-width: 480px) {
+  .chat-main {
+    padding: 0;
+  }
+
+  .chat-input-bar {
+    padding: 6px;
+  }
+
+  .message-item {
+    max-width: 90%;
+    font-size: 13px;
+  }
 }
 
-/* Responsive */
-
+/* Menu index : grille auto sur mobile */
 @media (max-width: 600px) {
-  .auth-box {
-    margin: 0 12px;
+  .menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 
-  .main {
-    padding-left: 12px;
-    padding-right: 12px;
+  .menu-item {
+    width: 100%;
+    text-align: center;
   }
+}
 
+/* Formulaires : largeur totale sur mobile */
+@media (max-width: 500px) {
+  .auth-box,
+  .form-section,
+  .list-section {
+    margin: 0 10px;
+    padding: 14px;
+  }
+}
+
+/* Header : compact sur mobile */
+@media (max-width: 450px) {
   .header {
+    height: 50px;
     padding: 0 10px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .btn-secondary {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }
