@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <header class="header">
     <h1>Phone</h1>
@@ -13,6 +14,13 @@
   </header>
 
   <main class="main">
+
+    <section class="user-info">
+      <h2>Mon compte</h2>
+      <p id="myEmail"></p>
+      <p id="myPhoneNumber"></p>
+    </section>
+
     <nav class="menu">
       <a href="calls.html" class="menu-item">Appels</a>
       <a href="contact.html" class="menu-item">Contacts</a>
@@ -24,17 +32,26 @@
       <h2>Bienvenue sur Phone</h2>
       <p>Sélectionne une section dans le menu.</p>
     </section>
+
   </main>
 
   <script type="module">
-    import { checkAuth, logout } from "./app.js";
+    import { checkAuth, logout, db } from "./app.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    checkAuth();
+    checkAuth().then(async (user) => {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      const data = snap.data();
 
-    const logoutBtn = document.getElementById("logoutBtn");
-    logoutBtn.addEventListener("click", () => {
-      logout();
+      document.getElementById("myEmail").textContent =
+        "Email : " + user.email;
+
+      document.getElementById("myPhoneNumber").textContent =
+        "Numéro Phone : " + (data.phoneNumber || "Non attribué");
     });
+
+    document.getElementById("logoutBtn").onclick = logout;
   </script>
+
 </body>
 </html>
