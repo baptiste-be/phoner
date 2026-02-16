@@ -5,6 +5,102 @@
   <title>Phone® – Messages</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <style>
+    .messaging-layout {
+      display: flex;
+      gap: 10px;
+      height: calc(100vh - 80px);
+    }
+    .conv-panel {
+      width: 35%;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 18px;
+      background: rgba(10, 12, 18, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+    .conv-header {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+    .conv-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .conv-item {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.15s ease-out;
+    }
+    .conv-item:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .conv-item.active {
+      background: rgba(79, 156, 255, 0.12);
+    }
+    .conv-main {
+      display: flex;
+      flex-direction: column;
+    }
+    .conv-phone {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .conv-last {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .conv-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+    .conv-badge {
+      color: #4f9cff;
+      font-size: 0.8rem;
+    }
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header {
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .chat-header span {
+      font-weight: 500;
+      color: var(--text-main);
+    }
+    @media (max-width: 800px) {
+      .messaging-layout {
+        flex-direction: column;
+      }
+      .conv-panel {
+        width: 100%;
+        min-width: 0;
+        height: 40%;
+      }
+      .chat-panel {
+        height: 60%;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -16,36 +112,29 @@
   </header>
 
   <main class="app-shell">
-    <section class="card chat-wrapper">
-      <div class="card-header">
-        <div class="card-title">Discussion par numéro Phone®</div>
+    <section class="card messaging-layout">
+      <!-- Panneau gauche : liste des discussions -->
+      <div class="conv-panel">
+        <div class="conv-header">Discussions</div>
+        <div class="conv-list" id="conv-list"></div>
       </div>
 
-      <form id="target-form" style="margin-bottom:8px; display:flex; gap:8px;">
-        <input id="target-number" type="text" placeholder="Numéro Phone® (XX-XX-XX-XX-XX)" required>
-        <button class="btn btn-ghost" type="submit">Ouvrir</button>
-      </form>
+      <!-- Panneau droit : chat -->
+      <div class="chat-panel">
+        <div class="chat-header">
+          Discussion avec : <span id="chat-target">aucune</span>
+        </div>
 
-      <div class="chat-messages" id="messages-list"></div>
+        <div class="chat-messages" id="messages-list"></div>
 
-      <form id="message-form" class="chat-input-row">
-        <input id="message-input" type="text" placeholder="Écris un message..." autocomplete="off" required>
-        <button type="submit" class="btn btn-primary">Envoyer</button>
-      </form>
+        <form id="message-form" class="chat-input-row">
+          <input id="message-input" type="text" placeholder="Écris un message..." autocomplete="off" required>
+          <button type="submit" class="btn btn-primary">Envoyer</button>
+        </form>
+      </div>
     </section>
   </main>
 
   <script type="module" src="messages.js"></script>
-  <script type="module">
-    // ouverture automatique depuis conversations.html ?to=...
-    const params = new URLSearchParams(window.location.search);
-    const to = params.get("to");
-    if (to) {
-      const input = document.getElementById("target-number");
-      input.value = to;
-      const event = new Event("submit");
-      document.getElementById("target-form").dispatchEvent(event);
-    }
-  </script>
 </body>
 </html>
