@@ -24,37 +24,71 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Remplace par ta vraie config Firebase
+// CONFIG FIREBASE À REMPLACER PAR LA TIENNE
 const firebaseConfig = {
-  apiKey: "AIzaSyCJZ7do_9CSXrG2npc1DPi0F2mzmRUFuBw",
-  authDomain: "phone-7b65b.firebaseapp.com",
-  projectId: "phone-7b65b",
-  storageBucket: "phone-7b65b.firebasestorage.app",
-  messagingSenderId: "385403300521",
-  appId: "1:385403300521:web:7e9c475a025fce7b8697b8"
+  apiKey: "TA_CLE_API",
+  authDomain: "TON_PROJET.firebaseapp.com",
+  projectId: "TON_PROJET",
+  storageBucket: "TON_PROJET.appspot.com",
+  messagingSenderId: "TON_SENDER_ID",
+  appId: "TON_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Génération simple d’un numéro Phone® unique
+// Génère un numéro Phone au format XX-XX-XX-XX-XX (chiffres uniquement)
 function generatePhoneNumber(uid) {
-  const base = uid.replace(/[^0-9a-z]/gi, "").slice(0, 8).padEnd(8, "0");
-  return "+990" + base;
+  let numeric = "";
+
+  for (let i = 0; i < uid.length; i++) {
+    numeric += (uid.charCodeAt(i) % 10).toString();
+  }
+
+  numeric = numeric.substring(0, 10).padEnd(10, "0");
+
+  return (
+    numeric.substring(0, 2) + "-" +
+    numeric.substring(2, 4) + "-" +
+    numeric.substring(4, 6) + "-" +
+    numeric.substring(6, 8) + "-" +
+    numeric.substring(8, 10)
+  );
 }
 
-// Vérifie l’authentification et redirige si nécessaire
-function checkAuth() {
+// Vérifie l’authentification + crée le numéro si absent
+async function checkAuth() {
   return new Promise((resolve) => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (!user) {
         if (!location.pathname.endsWith("login.html")) {
           window.location.href = "login.html";
         }
-      } else {
-        resolve(user);
+        return;
       }
+
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+
+      if (!snap.exists()) {
+        const phoneNumber = generatePhoneNumber(user.uid);
+        await setDoc(userRef, {
+          email: user.email,
+          phoneNumber
+        });
+      } else {
+        const data = snap.data();
+        if (!data.phoneNumber) {
+          const phoneNumber = generatePhoneNumber(user.uid);
+          await setDoc(userRef, {
+            ...data,
+            phoneNumber
+          });
+        }
+      }
+
+      resolve(user);
     });
   });
 }
@@ -65,7 +99,7 @@ async function logout() {
   window.location.href = "login.html";
 }
 
-// Gestion du formulaire login / register
+// Soumission formulaire login / register
 async function submitForm(mode) {
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
@@ -101,7 +135,7 @@ async function submitForm(mode) {
   }
 }
 
-// Bascule entre mode connexion / création
+// Bascule login / création
 function toggleMode() {
   const modeInput = document.getElementById("mode");
   const title = document.getElementById("loginTitle");
@@ -115,12 +149,12 @@ function toggleMode() {
 
   if (modeInput.value === "login") {
     modeInput.value = "register";
-    title.textContent = "Créer un compte Phone®";
+    title.textContent = "Créer un compte Phone";
     submitBtn.textContent = "Créer un compte";
     toggleLink.textContent = "Déjà un compte ? Se connecter";
   } else {
     modeInput.value = "login";
-    title.textContent = "Connexion Phone®";
+    title.textContent = "Connexion Phone";
     submitBtn.textContent = "Connexion";
     toggleLink.textContent = "Pas de compte ? Créer un compte";
   }
@@ -145,4 +179,3 @@ export {
   setDoc,
   getDoc
 };
-
