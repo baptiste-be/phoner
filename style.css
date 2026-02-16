@@ -1,6 +1,3 @@
-/* --------------------
-   RESET & BASE
----------------------*/
 *,
 *::before,
 *::after {
@@ -12,7 +9,6 @@
 :root {
   --bg-main: #05060a;
   --bg-card: rgba(15, 18, 25, 0.75);
-  --bg-card-strong: rgba(15, 18, 25, 0.9);
   --accent: #4f9cff;
   --accent-soft: rgba(79, 156, 255, 0.3);
   --danger: #ff4f6a;
@@ -43,9 +39,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* --------------------
-   GLOBAL LAYOUT
----------------------*/
 .app-shell {
   min-height: 100vh;
   display: flex;
@@ -55,9 +48,6 @@ body {
   margin: 0 auto;
 }
 
-/* --------------------
-   HEADER
----------------------*/
 header {
   position: fixed;
   top: 0;
@@ -116,9 +106,6 @@ header .logout-btn:hover {
   transform: translateY(-1px);
 }
 
-/* --------------------
-   CARDS / CONTAINERS
----------------------*/
 .card {
   background: var(--bg-card);
   border-radius: var(--radius-lg);
@@ -150,23 +137,9 @@ header .logout-btn:hover {
   color: var(--text-muted);
 }
 
-/* --------------------
-   TYPO
----------------------*/
-h1,
-h2,
-h3 {
-  font-weight: 600;
-}
-
 h1 {
   font-size: 1.4rem;
   margin-bottom: 8px;
-}
-
-h2 {
-  font-size: 1.1rem;
-  margin-bottom: 6px;
 }
 
 p {
@@ -174,9 +147,6 @@ p {
   line-height: 1.5;
 }
 
-/* --------------------
-   FORMS
----------------------*/
 form {
   display: flex;
   flex-direction: column;
@@ -217,9 +187,6 @@ textarea::placeholder {
   color: var(--text-muted);
 }
 
-/* --------------------
-   BUTTONS
----------------------*/
 .btn {
   border-radius: var(--radius-pill);
   border: none;
@@ -255,9 +222,6 @@ textarea::placeholder {
   background: rgba(255, 255, 255, 0.07);
 }
 
-/* --------------------
-   LINKS
----------------------*/
 a {
   color: var(--accent);
   text-decoration: none;
@@ -268,9 +232,8 @@ a:hover {
   text-decoration: underline;
 }
 
-/* --------------------
-   LOGIN PAGE
----------------------*/
+/* LOGIN */
+
 .auth-wrapper {
   min-height: 100vh;
   display: flex;
@@ -323,16 +286,14 @@ a:hover {
   padding: 0;
 }
 
-/* Zone d’erreur */
 .error-message {
   margin-top: 6px;
   font-size: 0.8rem;
   color: var(--danger);
 }
 
-/* --------------------
-   INDEX / DASHBOARD
----------------------*/
+/* INDEX */
+
 .dashboard-header {
   margin-bottom: 12px;
 }
@@ -366,7 +327,6 @@ a:hover {
   font-size: 0.9rem;
 }
 
-/* Menu principal */
 .main-menu {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -397,127 +357,20 @@ a:hover {
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
 }
 
-/* --------------------
-   CONTACTS
----------------------*/
-.contacts-list {
+/* CONTACTS / LISTS */
+
+.contacts-list,
+.calls-list,
+.history-list {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 55vh;
+  max-height: 60vh;
   overflow-y: auto;
 }
 
-.contact-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 9px 11px;
-  border-radius: var(--radius-md);
-  background: rgba(10, 12, 18, 0.9);
-  border: 1px solid var(--border-soft);
-}
-
-.contact-main {
-  display: flex;
-  flex-direction: column;
-}
-
-.contact-name {
-  font-size: 0.95rem;
-  font-weight: 500;
-}
-
-.contact-number {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-/* --------------------
-   MESSAGES (BeReal / Liquid Glass)
----------------------*/
-.chat-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 80px);
-}
-
-.chat-messages {
-  flex: 1;
-  margin-bottom: 10px;
-  padding: 10px 4px 4px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Bulle de message */
-.message-bubble {
-  max-width: 78%;
-  padding: 9px 11px;
-  border-radius: 18px;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  position: relative;
-  backdrop-filter: blur(var(--blur-soft));
-  -webkit-backdrop-filter: blur(var(--blur-soft));
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
-}
-
-/* Messages des autres (gauche) */
-.message-bubble.other {
-  align-self: flex-start;
-  background: rgba(15, 18, 25, 0.9);
-  border-bottom-left-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-/* Messages de moi (droite) façon BeReal / highlight */
-.message-bubble.me {
-  align-self: flex-end;
-  background: linear-gradient(
-    135deg,
-    rgba(79, 156, 255, 0.95),
-    rgba(127, 107, 255, 0.95)
-  );
-  color: #fff;
-  border-bottom-right-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-/* Meta (from / heure) */
-.message-meta {
-  margin-top: 3px;
-  font-size: 0.7rem;
-  opacity: 0.7;
-}
-
-/* Input zone */
-.chat-input-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.chat-input-row input[type="text"],
-.chat-input-row textarea {
-  flex: 1;
-}
-
-/* --------------------
-   CALLS
----------------------*/
-.calls-list {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 55vh;
-  overflow-y: auto;
-}
-
+.contact-item,
 .call-item {
   display: flex;
   justify-content: space-between;
@@ -528,14 +381,21 @@ a:hover {
   border: 1px solid var(--border-soft);
 }
 
+.contact-main,
 .call-main {
   display: flex;
   flex-direction: column;
 }
 
+.contact-name,
 .call-number {
   font-size: 0.95rem;
   font-weight: 500;
+}
+
+.contact-number {
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .call-type {
@@ -557,21 +417,74 @@ a:hover {
   color: var(--text-muted);
 }
 
-/* --------------------
-   HISTORY
----------------------*/
-.history-list {
-  margin-top: 10px;
+/* CHAT */
+
+.chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 80px);
+}
+
+.chat-messages {
+  flex: 1;
+  margin-bottom: 10px;
+  padding: 10px 4px 4px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 60vh;
-  overflow-y: auto;
 }
 
-/* --------------------
-   SCROLLBAR
----------------------*/
+.message-bubble {
+  max-width: 78%;
+  padding: 9px 11px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  position: relative;
+  backdrop-filter: blur(var(--blur-soft));
+  -webkit-backdrop-filter: blur(var(--blur-soft));
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
+}
+
+.message-bubble.other {
+  align-self: flex-start;
+  background: rgba(15, 18, 25, 0.9);
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.message-bubble.me {
+  align-self: flex-end;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 156, 255, 0.95),
+    rgba(127, 107, 255, 0.95)
+  );
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.message-meta {
+  margin-top: 3px;
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.chat-input-row input[type="text"],
+.chat-input-row textarea {
+  flex: 1;
+}
+
+/* SCROLLBAR */
+
 .chat-messages::-webkit-scrollbar,
 .contacts-list::-webkit-scrollbar,
 .calls-list::-webkit-scrollbar,
@@ -587,9 +500,8 @@ a:hover {
   border-radius: 999px;
 }
 
-/* --------------------
-   RESPONSIVE
----------------------*/
+/* RESPONSIVE */
+
 @media (min-width: 768px) {
   .app-shell {
     padding: 80px 24px 24px;

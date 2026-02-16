@@ -1,58 +1,85 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phone® · Connexion</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <main class="page center-page">
-      <section class="glass card auth-card">
-        <h1 class="brand">Phone®</h1>
-        <h2 id="authTitle">Connexion</h2>
+<head>
+  <meta charset="UTF-8">
+  <title>Phone® – Connexion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-title">Phone®</div>
+        <div class="auth-subtitle" id="auth-subtitle">Connecte-toi à ton espace.</div>
+      </div>
 
-        <form id="authForm" class="stack">
-          <label>
-            Email
-            <input id="email" type="email" placeholder="nom@domaine.com" required />
-          </label>
+      <form id="auth-form">
+        <div>
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="ton@email.com" required>
+        </div>
+        <div>
+          <label for="password">Mot de passe</label>
+          <input id="password" type="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-btn">Connexion</button>
+        <div class="error-message" id="error-zone"></div>
+      </form>
 
-          <label>
-            Mot de passe
-            <input id="password" type="password" minlength="6" required />
-          </label>
+      <div class="auth-toggle">
+        <span id="toggle-text">Pas encore de compte ?</span>
+        <button type="button" id="toggle-btn">Créer un compte</button>
+      </div>
+    </div>
+  </div>
 
-          <button id="submitBtn" type="submit" class="btn-primary">Se connecter</button>
-        </form>
+  <script type="module">
+    import { submitForm } from './app.js';
 
-        <button id="modeSwitch" type="button" class="btn-link">Pas encore de compte ? Créer un compte</button>
-        <p id="errorBox" class="error-box"></p>
-      </section>
-    </main>
+    let mode = "login";
+    const form = document.getElementById('auth-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorZone = document.getElementById('error-zone');
+    const toggleBtn = document.getElementById('toggle-btn');
+    const toggleText = document.getElementById('toggle-text');
+    const submitBtn = document.getElementById('submit-btn');
+    const subtitle = document.getElementById('auth-subtitle');
 
-    <script type="module">
-      import { getCurrentMode, submitForm, toggleMode, normalizeError } from "./app.js";
+    function setError(msg) {
+      errorZone.textContent = msg || "";
+    }
 
-      const authForm = document.getElementById("authForm");
-      const modeSwitch = document.getElementById("modeSwitch");
-      const errorBox = document.getElementById("errorBox");
+    function updateMode() {
+      if (mode === "login") {
+        submitBtn.textContent = "Connexion";
+        toggleText.textContent = "Pas encore de compte ?";
+        toggleBtn.textContent = "Créer un compte";
+        subtitle.textContent = "Connecte-toi à ton espace Phone®.";
+      } else {
+        submitBtn.textContent = "Créer un compte";
+        toggleText.textContent = "Déjà un compte ?";
+        toggleBtn.textContent = "Se connecter";
+        subtitle.textContent = "Crée ton compte Phone®.";
+      }
+      setError("");
+    }
 
-      authForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        errorBox.textContent = "";
-        try {
-          await submitForm(getCurrentMode());
-          window.location.href = "index.html";
-        } catch (error) {
-          errorBox.textContent = normalizeError(error);
-        }
-      });
+    toggleBtn.addEventListener('click', () => {
+      mode = mode === "login" ? "register" : "login";
+      updateMode();
+    });
 
-      modeSwitch.addEventListener("click", () => {
-        errorBox.textContent = "";
-        toggleMode();
-      });
-    </script>
-  </body>
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      setError("");
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      submitForm(mode, email, password, setError);
+    });
+
+    updateMode();
+  </script>
+</body>
 </html>

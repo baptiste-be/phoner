@@ -1,51 +1,61 @@
-import { addDoc, auth, checkAuth, collection, db, getDocs, query } from "./app.js";
+// contacts.js
+import {
+  checkAuth,
+  logout,
+  db,
+  collection,
+  addDoc,
+  getDocs,
+  doc
+} from './app.js';
 
-const contactForm = document.getElementById("contactForm");
-const contactList = document.getElementById("contactList");
-const phoneRegex = /^\d{2}-\d{2}-\d{2}-\d{2}-\d{2}$/;
+const logoutBtn = document.getElementById('logout-btn');
+const form = document.getElementById('contact-form');
+const nameInput = document.getElementById('contact-name');
+const numberInput = document.getElementById('contact-number');
+const listEl = document.getElementById('contacts-list');
 
-export async function addContact() {
-  const user = auth.currentUser;
-  if (!user) return;
+let currentUser = null;
 
-  const name = document.getElementById("contactName").value.trim();
-  const number = document.getElementById("contactNumber").value.trim();
+logoutBtn.addEventListener('click', () => logout());
 
-  if (!name || !phoneRegex.test(number)) {
-    return;
-  }
+async function addContact() {
+  const name = nameInput.value.trim();
+  const number = numberInput.value.trim();
+  if (!name || !number || !currentUser) return;
 
-  await addDoc(collection(db, "contacts", user.uid, "list"), { name, number });
-  document.getElementById("contactName").value = "";
-  document.getElementById("contactNumber").value = "";
+  const colRef = collection(db, "contacts", currentUser.uid, "list");
+  await addDoc(colRef, { name, number });
+  nameInput.value = "";
+  numberInput.value = "";
   await loadContacts();
 }
 
-export async function loadContacts() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const q = query(collection(db, "contacts", user.uid, "list"));
-  const snapshot = await getDocs(q);
-
-  contactList.innerHTML = "";
-  if (snapshot.empty) {
-    contactList.innerHTML = "<li>Aucun contact.</li>";
-    return;
-  }
-
-  snapshot.forEach((docSnap) => {
+async function loadContacts() {
+  if (!currentUser) return;
+  listEl.innerHTML = "";
+  const colRef = collection(db, "contacts", currentUser.uid, "list");
+  const snap = await getDocs(colRef);
+  snap.forEach((docSnap) => {
     const data = docSnap.data();
-    const li = document.createElement("li");
-    li.innerHTML = `<strong>${data.name}</strong><br>${data.number}`;
-    contactList.appendChild(li);
+    const item = document.createElement('div');
+    item.className = "contact-item";
+    item.innerHTML = `
+      <div class="contact-main">
+        <div class="contact-name">${data.name || ""}</div>
+        <div class="contact-number">${data.number || ""}</div>
+      </div>
+    `;
+    listEl.appendChild(item);
   });
 }
 
-await checkAuth();
-await loadContacts();
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  addContact();
+});
 
-contactForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  await addContact();
+checkAuth(true).then(({ user }) => {
+  currentUser = user;
+  if (user) loadContacts();
 });

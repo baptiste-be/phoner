@@ -1,31 +1,44 @@
-import { addDoc, auth, checkAuth, collection, db, serverTimestamp } from "./app.js";
+// calls.js
+import {
+  checkAuth,
+  logout,
+  db,
+  collection,
+  addDoc,
+  serverTimestamp
+} from './app.js';
 
-const callForm = document.getElementById("callForm");
-const phoneRegex = /^\d{2}-\d{2}-\d{2}-\d{2}-\d{2}$/;
+const logoutBtn = document.getElementById('logout-btn');
+const form = document.getElementById('call-form');
+const numberInput = document.getElementById('call-number');
+const typeSelect = document.getElementById('call-type');
 
-export async function saveCall() {
-  const user = auth.currentUser;
-  if (!user) return;
+let currentUser = null;
 
-  const number = document.getElementById("callNumber").value.trim();
-  const type = document.getElementById("callType").value;
+logoutBtn.addEventListener('click', () => logout());
 
-  if (!phoneRegex.test(number)) {
-    return;
-  }
+async function saveCall() {
+  if (!currentUser) return;
+  const number = numberInput.value.trim();
+  const type = typeSelect.value;
+  if (!number || !type) return;
 
-  await addDoc(collection(db, "history", user.uid, "calls"), {
+  const colRef = collection(db, "history", currentUser.uid, "calls");
+  await addDoc(colRef, {
     number,
     type,
     timestamp: serverTimestamp()
   });
 
-  document.getElementById("callNumber").value = "";
+  numberInput.value = "";
+  typeSelect.value = "entrant";
 }
 
-await checkAuth();
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  saveCall();
+});
 
-callForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  await saveCall();
+checkAuth(true).then(({ user }) => {
+  currentUser = user;
 });

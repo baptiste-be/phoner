@@ -1,40 +1,67 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phone®</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header class="topbar glass">
-      <div>
-        <h1 class="brand">Phone®</h1>
-        <p class="muted">Accueil</p>
+<head>
+  <meta charset="UTF-8">
+  <title>Phone® – Accueil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-title">Phone®</span>
+      <span class="brand-sub">Tableau de bord</span>
+    </div>
+    <button class="logout-btn" id="logout-btn">Déconnexion</button>
+  </header>
+
+  <main class="app-shell">
+    <section class="card">
+      <div class="dashboard-header">
+        <h1>Bienvenue sur Phone®</h1>
       </div>
-      <button id="logoutBtn" class="btn-danger" type="button">Déconnexion</button>
-    </header>
+      <div class="user-info">
+        <div>
+          <div class="user-info-label">Email</div>
+          <div class="user-info-value" id="user-email">—</div>
+        </div>
+        <div>
+          <div class="user-info-label">Numéro Phone®</div>
+          <div class="phone-number-pill" id="user-phone">—</div>
+        </div>
+      </div>
+    </section>
 
-    <main class="page">
-      <section class="glass card">
-        <h2>Compte</h2>
-        <p><strong>Email :</strong> <span id="userEmail">...</span></p>
-        <p><strong>Numéro Phone® :</strong> <span id="userPhone">...</span></p>
-      </section>
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">Navigation</div>
+      </div>
+      <div class="main-menu">
+        <a href="contact.html">Contacts</a>
+        <a href="message.html">Messages</a>
+        <a href="calls.html">Appels</a>
+        <a href="history.html">Historique</a>
+      </div>
+    </section>
+  </main>
 
-      <section class="grid-nav">
-        <a class="glass nav-card" href="calls.html">Appels</a>
-        <a class="glass nav-card" href="contact.html">Contacts</a>
-        <a class="glass nav-card" href="message.html">Messages</a>
-        <a class="glass nav-card" href="history.html">Historique</a>
-      </section>
-    </main>
+  <script type="module">
+    import { checkAuth, logout } from './app.js';
 
-    <script type="module">
-      import { checkAuth, logout } from "./app.js";
+    const emailSpan = document.getElementById('user-email');
+    const phoneSpan = document.getElementById('user-phone');
+    const logoutBtn = document.getElementById('logout-btn');
 
-      await checkAuth();
-      document.getElementById("logoutBtn").addEventListener("click", logout);
-    </script>
-  </body>
+    checkAuth(true).then(({ user, phoneNumber }) => {
+      if (user) {
+        emailSpan.textContent = user.email || "—";
+        phoneSpan.textContent = phoneNumber || "—";
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      logout();
+    });
+  </script>
+</body>
 </html>

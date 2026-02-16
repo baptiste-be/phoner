@@ -1,173 +1,16 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+// app.js
 import {
-  createUserWithEmailAndPassword,
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import {
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
   getFirestore,
-  onSnapshot,
-  orderBy,
-  query,
-  serverTimestamp,
-  setDoc,
-  where
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js";
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-const phoneRegex = /^\d{2}-\d{2}-\d{2}-\d{2}-\d{2}$/;
-let currentMode = "login";
-
-function safeText(id, text) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = text;
-}
-
-function normalizeError(error) {
-  const code = error?.code || "";
-  const map = {
-    "auth/email-already-in-use": "Cet email est déjà utilisé.",
-    "auth/invalid-email": "Adresse email invalide.",
-    "auth/weak-password": "Mot de passe trop faible (minimum 6 caractères).",
-    "auth/invalid-credential": "Identifiants invalides.",
-    "auth/user-not-found": "Utilisateur introuvable.",
-    "auth/wrong-password": "Mot de passe incorrect.",
-    "auth/network-request-failed": "Erreur réseau.",
-    "auth/operation-not-allowed": "Active Email/Mot de passe dans Firebase Authentication."
-  };
-  return map[code] || error?.message || "Une erreur est survenue.";
-}
-
-export function generatePhoneNumber(uid) {
-  const digits = [];
-  let seed = 0;
-
-  for (let i = 0; i < uid.length; i += 1) {
-    seed = (seed * 31 + uid.charCodeAt(i)) % 1000000007;
-  }
-
-  while (digits.length < 10) {
-    seed = (seed * 1664525 + 1013904223) % 4294967296;
-    const block = String(seed).padStart(10, "0");
-    for (const c of block) {
-      digits.push(c);
-      if (digits.length === 10) break;
-    }
-  }
-
-  return `${digits[0]}${digits[1]}-${digits[2]}${digits[3]}-${digits[4]}${digits[5]}-${digits[6]}${digits[7]}-${digits[8]}${digits[9]}`;
-}
-
-async function ensureUserPhone(uid, email = "") {
-  const userRef = doc(db, "users", uid);
-  const snap = await getDoc(userRef);
-
-  if (snap.exists() && phoneRegex.test(snap.data().phoneNumber || "")) {
-    return snap.data().phoneNumber;
-  }
-
-  let phone = generatePhoneNumber(uid);
-
-  // ensure uniqueness among users
-  let guard = 0;
-  while (guard < 30) {
-    const q = query(collection(db, "users"), where("phoneNumber", "==", phone));
-    const res = await getDocs(q);
-    if (res.empty || (res.size === 1 && res.docs[0].id === uid)) {
-      break;
-    }
-    phone = generatePhoneNumber(`${uid}-${guard}`);
-    guard += 1;
-  }
-
-  await setDoc(
-    userRef,
-    {
-      email,
-      phoneNumber: phone,
-      updatedAt: serverTimestamp()
-    },
-    { merge: true }
-  );
-
-  return phone;
-}
-
-export async function checkAuth() {
-  return new Promise((resolve) => {
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      const phone = await ensureUserPhone(user.uid, user.email || "");
-      safeText("userEmail", user.email || "-");
-      safeText("userPhone", phone);
-      resolve(user);
-    });
-  });
-}
-
-export async function submitForm(mode) {
-  const email = document.getElementById("email")?.value?.trim() || "";
-  const password = document.getElementById("password")?.value || "";
-
-  if (!email || !password) {
-    throw new Error("Email et mot de passe requis.");
-  }
-
-  if (mode === "register") {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await ensureUserPhone(cred.user.uid, email);
-    return cred;
-  }
-
-  return signInWithEmailAndPassword(auth, email, password);
-}
-
-export function toggleMode() {
-  currentMode = currentMode === "login" ? "register" : "login";
-  const title = document.getElementById("authTitle");
-  const submitBtn = document.getElementById("submitBtn");
-  const modeSwitch = document.getElementById("modeSwitch");
-
-  if (title) {
-    title.textContent = currentMode === "login" ? "Connexion" : "Créer un compte";
-  }
-
-  if (submitBtn) {
-    submitBtn.textContent = currentMode === "login" ? "Se connecter" : "Créer le compte";
-  }
-
-  if (modeSwitch) {
-    modeSwitch.textContent =
-      currentMode === "login" ? "Pas encore de compte ? Créer un compte" : "Déjà un compte ? Se connecter";
-  }
-}
-
-export function getCurrentMode() {
-  return currentMode;
-}
-
-export async function logout() {
-  await signOut(auth);
-  window.location.href = "login.html";
-}
-
-export { auth, db };
-export {
   collection,
   addDoc,
   getDocs,
@@ -178,6 +21,106 @@ export {
   orderBy,
   doc,
   setDoc,
-  getDoc,
-  normalizeError
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCJZ7do_9CSXrG2npc1DPi0F2mzmRUFuBw",
+  authDomain: "phone-7b65b.firebaseapp.com",
+  projectId: "phone-7b65b",
+  storageBucket: "phone-7b65b.firebasestorage.app",
+  messagingSenderId: "385403300521",
+  appId: "1:385403300521:web:7e9c475a025fce7b8697b8",
+  measurementId: "G-FPF77V4WN7"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+function hashUidToDigits(uid) {
+  let acc = "";
+  for (let i = 0; i < uid.length && acc.length < 10; i++) {
+    const code = uid.charCodeAt(i);
+    acc += (code % 10).toString();
+  }
+  while (acc.length < 10) acc += "0";
+  return acc;
+}
+
+export async function generatePhoneNumber(uid) {
+  const digits = hashUidToDigits(uid);
+  return `${digits.slice(0, 2)}-${digits.slice(2, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}-${digits.slice(8, 10)}`;
+}
+
+export async function ensureUserPhone(user) {
+  const userRef = doc(db, "users", user.uid);
+  const snap = await getDoc(userRef);
+  if (snap.exists()) {
+    const data = snap.data();
+    if (data.phoneNumber) return data.phoneNumber;
+  }
+  const phoneNumber = await generatePhoneNumber(user.uid);
+  await setDoc(userRef, {
+    email: user.email,
+    phoneNumber
+  }, { merge: true });
+  return phoneNumber;
+}
+
+export function checkAuth(redirectIfNoUser = true) {
+  return new Promise((resolve) => {
+    onAuthStateChanged(auth, async (user) => {
+      if (!user && redirectIfNoUser) {
+        window.location.href = "login.html";
+        return;
+      }
+      if (user) {
+        const phoneNumber = await ensureUserPhone(user);
+        resolve({ user, phoneNumber });
+      } else {
+        resolve({ user: null, phoneNumber: null });
+      }
+    });
+  });
+}
+
+export async function submitForm(mode, email, password, setError) {
+  try {
+    let cred;
+    if (mode === "login") {
+      cred = await signInWithEmailAndPassword(auth, email, password);
+    } else {
+      cred = await createUserWithEmailAndPassword(auth, email, password);
+      await ensureUserPhone(cred.user);
+    }
+    window.location.href = "index.html";
+  } catch (e) {
+    console.error(e);
+    if (setError) setError(e.message);
+  }
+}
+
+export function logout() {
+  return signOut(auth).then(() => {
+    window.location.href = "login.html";
+  });
+}
+
+// Export Firestore helpers
+export {
+  auth,
+  db,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+  serverTimestamp,
+  orderBy,
+  doc,
+  setDoc,
+  getDoc
 };

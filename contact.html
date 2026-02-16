@@ -1,33 +1,46 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phone® · Contacts</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header class="topbar glass">
-      <h1 class="brand">Phone®</h1>
-      <a class="btn-link" href="index.html">Retour</a>
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <title>Phone® – Contacts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-title">Phone®</span>
+      <span class="brand-sub">Contacts</span>
+    </div>
+    <button class="logout-btn" id="logout-btn">Déconnexion</button>
+  </header>
 
-    <main class="page">
-      <section class="glass card">
-        <h2>Ajouter un contact</h2>
-        <form id="contactForm" class="stack">
-          <input id="contactName" placeholder="Nom" required />
-          <input id="contactNumber" placeholder="12-34-56-78-90" required />
-          <button type="submit" class="btn-primary">Ajouter</button>
-        </form>
-      </section>
+  <main class="app-shell">
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">Ajouter un contact</div>
+      </div>
+      <form id="contact-form">
+        <div>
+          <label for="contact-name">Nom</label>
+          <input id="contact-name" type="text" placeholder="Nom du contact" required>
+        </div>
+        <div>
+          <label for="contact-number">Numéro Phone®</label>
+          <input id="contact-number" type="text" placeholder="XX-XX-XX-XX-XX" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+      </form>
+    </section>
 
-      <section class="glass card">
-        <h2>Liste des contacts</h2>
-        <ul id="contactList" class="list"></ul>
-      </section>
-    </main>
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">Mes contacts</div>
+      </div>
+      <div class="contacts-list" id="contacts-list"></div>
+    </section>
+  </main>
 
-    <script type="module" src="contacts.js"></script>
-  </body>
+  <script type="module" src="contacts.js"></script>
+</body>
 </html>

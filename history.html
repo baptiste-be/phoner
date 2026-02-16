@@ -1,24 +1,29 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phone® · Historique</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header class="topbar glass">
-      <h1 class="brand">Phone®</h1>
-      <a class="btn-link" href="index.html">Retour</a>
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <title>Phone® – Historique</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-title">Phone®</span>
+      <span class="brand-sub">Historique</span>
+    </div>
+    <button class="logout-btn" id="logout-btn">Déconnexion</button>
+  </header>
 
-    <main class="page">
-      <section class="glass card">
-        <h2>Historique des appels</h2>
-        <ul id="historyList" class="list"></ul>
-      </section>
-    </main>
+  <main class="app-shell">
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">Historique des appels</div>
+      </div>
+      <div class="history-list" id="history-list"></div>
+    </section>
+  </main>
 
-    <script type="module" src="history.js"></script>
-  </body>
+  <script type="module" src="history.js"></script>
+</body>
 </html>

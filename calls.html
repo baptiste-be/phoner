@@ -1,31 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phone® · Appels</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header class="topbar glass">
-      <h1 class="brand">Phone®</h1>
-      <a class="btn-link" href="index.html">Retour</a>
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <title>Phone® – Appels</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-title">Phone®</span>
+      <span class="brand-sub">Appels</span>
+    </div>
+    <button class="logout-btn" id="logout-btn">Déconnexion</button>
+  </header>
 
-    <main class="page">
-      <section class="glass card">
-        <h2>Enregistrer un appel</h2>
-        <form id="callForm" class="stack">
-          <input id="callNumber" placeholder="12-34-56-78-90" required />
-          <select id="callType">
+  <main class="app-shell">
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">Enregistrer un appel</div>
+      </div>
+      <form id="call-form">
+        <div>
+          <label for="call-number">Numéro</label>
+          <input id="call-number" type="text" placeholder="Numéro appelé ou appelant" required>
+        </div>
+        <div>
+          <label for="call-type">Type</label>
+          <select id="call-type" required>
             <option value="entrant">Entrant</option>
             <option value="sortant">Sortant</option>
           </select>
-          <button type="submit" class="btn-primary">Enregistrer</button>
-        </form>
-      </section>
-    </main>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </form>
+    </section>
+  </main>
 
-    <script type="module" src="calls.js"></script>
-  </body>
+  <script type="module" src="calls.js"></script>
+</body>
 </html>
