@@ -1,75 +1,57 @@
-// messages.js
 import {
+  addDoc,
   auth,
-  db,
   checkAuth,
   collection,
-  addDoc,
+  db,
   onSnapshot,
-  serverTimestamp,
-  orderBy
+  orderBy,
+  query,
+  serverTimestamp
 } from "./app.js";
-import { query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const CHAT_ID = "global";
+const messagesList = document.getElementById("messagesList");
+const messageForm = document.getElementById("messageForm");
+const messageText = document.getElementById("messageText");
 
-async function sendMessage() {
-  const input = document.getElementById("messageInput");
-  const text = input.value.trim();
-  if (!text) return;
-
+export async function sendMessage() {
   const user = auth.currentUser;
   if (!user) return;
 
-  const textsCol = collection(db, "messages", CHAT_ID, "texts");
+  const text = messageText.value.trim();
+  if (!text) return;
 
-  await addDoc(textsCol, {
-    from: user.email,
+  await addDoc(collection(db, "messages", "global", "texts"), {
+    from: user.uid,
     text,
     timestamp: serverTimestamp()
   });
 
-  input.value = "";
+  messageText.value = "";
 }
 
-function subscribeMessages() {
-  const listEl = document.getElementById("messageList");
-  const textsCol = collection(db, "messages", CHAT_ID, "texts");
-  const q = query(textsCol, orderBy("timestamp", "asc"));
+export function subscribeMessages() {
+  const user = auth.currentUser;
+  if (!user) return;
 
-  onSnapshot(q, (snap) => {
-    listEl.innerHTML = "";
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      const div = document.createElement("div");
-      div.className = "message-item";
-      if (auth.currentUser && data.from === auth.currentUser.email) {
-        div.classList.add("me");
-      }
-      const from = data.from || "Inconnu";
-      const text = data.text || "";
-      div.textContent = from + " : " + text;
-      listEl.appendChild(div);
+  const q = query(collection(db, "messages", "global", "texts"), orderBy("timestamp", "asc"));
+  onSnapshot(q, (snapshot) => {
+    messagesList.innerHTML = "";
+    snapshot.forEach((docSnap) => {
+      const msg = docSnap.data();
+      const li = document.createElement("li");
+      li.className = `message-bubble ${msg.from === user.uid ? "me" : "other"}`;
+      li.innerHTML = `<span>${msg.text || ""}</span>`;
+      messagesList.appendChild(li);
     });
-    listEl.scrollTop = listEl.scrollHeight;
+    messagesList.scrollTop = messagesList.scrollHeight;
   });
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await checkAuth();
+await checkAuth();
+subscribeMessages();
 
-  const logoutBtn = document.getElementById("logoutBtn");
-  logoutBtn.addEventListener("click", () => {
-    import("./app.js").then(({ logout }) => logout());
-  });
-
-  const sendBtn = document.getElementById("sendBtn");
-  const input = document.getElementById("messageInput");
-
-  sendBtn.addEventListener("click", sendMessage);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
-
-  subscribeMessages();
+messageForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await sendMessage();
 });
