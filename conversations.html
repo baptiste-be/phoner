@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Phone - Messages</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-body">
+  <header class="header">
+    <h1>Messages Phone®</h1>
+    <nav class="header-nav">
+      <a href="index.html" class="menu-item">Accueil</a>
+      <button id="logoutBtn" class="btn-secondary">Déconnexion</button>
+    </nav>
+  </header>
+
+  <main class="main chat-main">
+    <section id="messageList" class="message-list"></section>
+
+    <section class="chat-input-bar">
+      <input id="messageInput" type="text" placeholder="Écrire un message...">
+      <button id="sendBtn" class="btn-primary">Envoyer</button>
+    </section>
+  </main>
+
+  <script type="module" src="messages.js"></script>
+</body>
+</html>
