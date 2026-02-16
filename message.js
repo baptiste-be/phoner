@@ -10,7 +10,9 @@ import {
   orderBy,
   query,
   getUserByPhoneNumber,
-  getOrCreateConversation
+  getOrCreateConversation,
+  updateUserConversation,
+  markConversationRead
 } from "./app.js";
 
 const logoutBtn = document.getElementById("logout-btn");
@@ -57,15 +59,18 @@ function subscribeToConversation(convId) {
   }
   const colRef = collection(db, "conversations", convId, "messages");
   const q = query(colRef, orderBy("timestamp", "asc"));
-  unsubscribeConv = onSnapshot(q, (snap) => {
+  unsubscribeConv = onSnapshot(q, async (snap) => {
     const messages = [];
     snap.forEach((docSnap) => messages.push(docSnap.data()));
     renderMessages(messages);
+    if (currentUser && convId) {
+      await markConversationRead(currentUser.uid, convId);
+    }
   });
 }
 
 async function openConversationWithNumber(number) {
-  if (!myPhone) return;
+  if (!myPhone || !currentUser) return;
   currentTargetNumber = number;
 
   const targetUser = await getUserByPhoneNumber(number);
@@ -79,8 +84,12 @@ async function openConversationWithNumber(number) {
       text: "Le numéro que vous essayez de joindre n'est pas attribué.",
       timestamp: serverTimestamp()
     });
+
+    await updateUserConversation(currentUser.uid, myPhone, number, convId, "Numéro non attribué", false);
   } else {
     convId = await getOrCreateConversation(myPhone, targetUser.phoneNumber);
+    await updateUserConversation(currentUser.uid, myPhone, targetUser.phoneNumber, convId, "Conversation ouverte", false);
+    await updateUserConversation(targetUser.uid, targetUser.phoneNumber, myPhone, convId, "Conversation ouverte", true);
   }
 
   currentConvId = convId;
@@ -89,7 +98,7 @@ async function openConversationWithNumber(number) {
 
 async function sendMessage() {
   const text = input.value.trim();
-  if (!text || !myPhone || !currentTargetNumber) return;
+  if (!text || !myPhone || !currentTargetNumber || !currentUser) return;
 
   const targetUser = await getUserByPhoneNumber(currentTargetNumber);
   let convId;
@@ -102,6 +111,8 @@ async function sendMessage() {
       text: "Le numéro que vous essayez de joindre n'est pas attribué.",
       timestamp: serverTimestamp()
     });
+
+    await updateUserConversation(currentUser.uid, myPhone, currentTargetNumber, convId, "Numéro non attribué", false);
   } else {
     convId = await getOrCreateConversation(myPhone, targetUser.phoneNumber);
     const colRef = collection(db, "conversations", convId, "messages");
@@ -110,6 +121,9 @@ async function sendMessage() {
       text,
       timestamp: serverTimestamp()
     });
+
+    await updateUserConversation(currentUser.uid, myPhone, targetUser.phoneNumber, convId, text, false);
+    await updateUserConversation(targetUser.uid, targetUser.phoneNumber, myPhone, convId, text, true);
   }
 
   currentConvId = convId;

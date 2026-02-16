@@ -38,7 +38,6 @@ function renderConversations(convs) {
       <div class="call-time">${time}</div>
     `;
     div.addEventListener("click", () => {
-      // On ouvre message.html avec le numéro en query string
       window.location.href = `message.html?to=${encodeURIComponent(c.otherPhone)}`;
     });
     listEl.appendChild(div);

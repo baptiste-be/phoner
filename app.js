@@ -114,7 +114,7 @@ export function logout() {
   });
 }
 
-// UTILISATEUR PAR NUMÉRO Phone®
+// Récupérer un user par numéro Phone®
 export async function getUserByPhoneNumber(phoneNumber) {
   const qUsers = query(collection(db, "users"), where("phoneNumber", "==", phoneNumber));
   const snap = await getDocs(qUsers);
@@ -123,7 +123,7 @@ export async function getUserByPhoneNumber(phoneNumber) {
   return { uid: docSnap.id, ...docSnap.data() };
 }
 
-// CONVERSATION ENTRE DEUX NUMÉROS
+// Trouver ou créer une conversation entre deux numéros
 export async function getOrCreateConversation(phoneA, phoneB) {
   const convRef = collection(db, "conversations");
   const qConv = query(
@@ -146,7 +146,50 @@ export async function getOrCreateConversation(phoneA, phoneB) {
   return newConv.id;
 }
 
+// Mettre à jour la vue "userConversations" pour un user
+export async function updateUserConversation(uid, myPhone, otherPhone, convId, lastText, unread = true) {
+  const userConvRef = collection(db, "userConversations", uid, "list");
+  const q = query(userConvRef, where("conversationId", "==", convId));
+  const snap = await getDocs(q);
 
+  if (snap.empty) {
+    await addDoc(userConvRef, {
+      conversationId: convId,
+      otherPhone,
+      lastMessage: lastText,
+      lastTimestamp: serverTimestamp(),
+      unread
+    });
+  } else {
+    const docId = snap.docs[0].id;
+    await setDoc(
+      doc(userConvRef, docId),
+      {
+        otherPhone,
+        lastMessage: lastText,
+        lastTimestamp: serverTimestamp(),
+        unread
+      },
+      { merge: true }
+    );
+  }
+}
+
+// Marquer une conversation comme lue pour un user
+export async function markConversationRead(uid, convId) {
+  const userConvRef = collection(db, "userConversations", uid, "list");
+  const q = query(userConvRef, where("conversationId", "==", convId));
+  const snap = await getDocs(q);
+  if (snap.empty) return;
+  const docId = snap.docs[0].id;
+  await setDoc(
+    doc(userConvRef, docId),
+    { unread: false },
+    { merge: true }
+  );
+}
+
+// EXPORT FIRESTORE
 export {
   auth,
   db,

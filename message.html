@@ -34,20 +34,18 @@
       </form>
     </section>
   </main>
-  
-  <script type="module">
-  // Ce script vient EN PLUS de messages.js
-  const params = new URLSearchParams(window.location.search);
-  const to = params.get("to");
-  if (to) {
-    const input = document.getElementById("target-number");
-    input.value = to;
-    const event = new Event("submit");
-    document.getElementById("target-form").dispatchEvent(event);
-  }
-</script>
-
 
   <script type="module" src="messages.js"></script>
+  <script type="module">
+    // ouverture automatique depuis conversations.html ?to=...
+    const params = new URLSearchParams(window.location.search);
+    const to = params.get("to");
+    if (to) {
+      const input = document.getElementById("target-number");
+      input.value = to;
+      const event = new Event("submit");
+      document.getElementById("target-form").dispatchEvent(event);
+    }
+  </script>
 </body>
 </html>
