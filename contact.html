@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Phone - Contacts</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-body">
+  <header class="header">
+    <h1>Contacts Phone®</h1>
+    <nav class="header-nav">
+      <a href="index.html" class="menu-item">Accueil</a>
+      <button id="logoutBtn" class="btn-secondary">Déconnexion</button>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="form-section">
+      <h2>Ajouter un contact</h2>
+      <div class="form-group">
+        <label for="contactName">Nom</label>
+        <input id="contactName" type="text">
+      </div>
+      <div class="form-group">
+        <label for="contactNumber">Numéro Phone®</label>
+        <input id="contactNumber" type="text" placeholder="+99000000000">
+      </div>
+      <div id="contactError" class="error-box"></div>
+      <button id="addContactBtn" class="btn-primary">Ajouter</button>
+    </section>
+
+    <section class="list-section">
+      <h2>Mes contacts</h2>
+      <ul id="contactList" class="list"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="contacts.js"></script>
+</body>
+</html>

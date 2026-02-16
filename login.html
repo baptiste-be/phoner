@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Phone - Connexion</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-body">
+  <header class="header">
+    <h1>Phone®</h1>
+  </header>
+
+  <main class="main center-main">
+    <section class="auth-box">
+      <h2 id="loginTitle">Connexion Phone®</h2>
+
+      <input type="hidden" id="mode" value="login">
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" autocomplete="current-password">
+      </div>
+
+      <div id="errorBox" class="error-box"></div>
+
+      <button id="submitBtn" class="btn-primary">Connexion</button>
+
+      <button id="toggleLink" class="link-button">
+        Pas de compte ? Créer un compte
+      </button>
+    </section>
+  </main>
+
+  <script type="module">
+    import { submitForm, toggleMode } from "./app.js";
+
+    const submitBtn = document.getElementById("submitBtn");
+    const toggleLink = document.getElementById("toggleLink");
+    const modeInput = document.getElementById("mode");
+
+    submitBtn.addEventListener("click", () => {
+      submitForm(modeInput.value);
+    });
+
+    toggleLink.addEventListener("click", () => {
+      toggleMode();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        submitForm(modeInput.value);
+      }
+    });
+  </script>
+</body>
+</html>

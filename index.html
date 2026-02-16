@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Phone - Accueil</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-body">
+  <header class="header">
+    <h1>Phone®</h1>
+    <button id="logoutBtn" class="btn-secondary">Déconnexion</button>
+  </header>
+
+  <main class="main">
+    <nav class="menu">
+      <a href="calls.html" class="menu-item">Appels</a>
+      <a href="contact.html" class="menu-item">Contacts</a>
+      <a href="message.html" class="menu-item">Messages</a>
+      <a href="history.html" class="menu-item">Historique</a>
+    </nav>
+
+    <section class="content">
+      <h2>Bienvenue sur Phone®</h2>
+      <p>Sélectionne une section dans le menu.</p>
+    </section>
+  </main>
+
+  <script type="module">
+    import { checkAuth, logout } from "./app.js";
+
+    checkAuth();
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    logoutBtn.addEventListener("click", () => {
+      logout();
+    });
+  </script>
+</body>
+</html>
