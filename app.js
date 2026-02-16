@@ -1,4 +1,3 @@
-// app.js
 import {
   initializeApp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -25,7 +24,6 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// CONFIG FIREBASE (la tienne)
 const firebaseConfig = {
   apiKey: "AIzaSyCJZ7do_9CSXrG2npc1DPi0F2mzmRUFuBw",
   authDomain: "phone-7b65b.firebaseapp.com",
@@ -40,7 +38,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ---------- NUMÉRO Phone® ----------
 function hashUidToDigits(uid) {
   let out = "";
   for (let i = 0; i < uid.length && out.length < 10; i++) {
@@ -52,7 +49,7 @@ function hashUidToDigits(uid) {
 
 async function generatePhoneNumber(uid) {
   const d = hashUidToDigits(uid);
-  return `${d.slice(0, 2)}-${d.slice(2, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}-${d.slice(8, 10)}`;
+  return `${d.slice(0,2)}-${d.slice(2,4)}-${d.slice(4,6)}-${d.slice(6,8)}-${d.slice(8,10)}`;
 }
 
 async function ensureUserPhone(user) {
@@ -73,12 +70,11 @@ async function ensureUserPhone(user) {
   return phone;
 }
 
-// ---------- AUTH ----------
 export function checkAuth() {
   return new Promise(resolve => {
     onAuthStateChanged(auth, async user => {
       if (!user) {
-        const email = `test${Math.floor(Math.random() * 100000)}@mail.com`;
+        const email = `test${Math.floor(Math.random()*99999)}@mail.com`;
         const password = "password123";
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         const phone = await ensureUserPhone(cred.user);
@@ -94,8 +90,6 @@ export function checkAuth() {
 export function logout() {
   return signOut(auth);
 }
-
-// ---------- HELPERS MESSAGERIE ----------
 
 export async function getUserByPhoneNumber(phoneNumber) {
   const qUsers = query(collection(db, "users"), where("phoneNumber", "==", phoneNumber));
@@ -116,9 +110,7 @@ export async function getOrCreateConversation(phoneA, phoneB) {
   );
 
   const snap = await getDocs(qConv);
-  if (!snap.empty) {
-    return snap.docs[0].id;
-  }
+  if (!snap.empty) return snap.docs[0].id;
 
   const newConv = await addDoc(convRef, {
     participants: [phoneA, phoneB]
@@ -169,7 +161,6 @@ export async function markConversationRead(uid, convId) {
 }
 
 export {
-  auth,
   db,
   collection,
   addDoc,

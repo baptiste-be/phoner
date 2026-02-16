@@ -1,70 +1,37 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Phone® – Messagerie</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<header class="topbar">
-  <div class="topbar-left">
-    <span class="logo">Phone®</span>
-    <span class="logo-sub">Messagerie</span>
+<div class="layout">
+
+  <div class="sidebar">
+    <h2>Contacts</h2>
+    <div id="contacts-list"></div>
+
+    <h2>Discussions</h2>
+    <div id="conv-list"></div>
   </div>
-  <button class="topbar-btn" id="logout-btn">Déconnexion</button>
-</header>
 
-<main class="app-shell">
+  <div class="chat">
+    <div class="chat-header">
+      <span id="chat-target">Aucun</span>
+    </div>
 
-  <section class="messaging-layout">
+    <div id="messages-list" class="messages"></div>
 
-    <!-- COLONNE GAUCHE : CONTACTS + DISCUSSIONS -->
-    <aside class="sidebar">
+    <form id="message-form">
+      <input id="message-input" placeholder="Message..." required>
+      <button type="submit">Envoyer</button>
+    </form>
+  </div>
 
-      <div class="sidebar-section">
-        <div class="sidebar-header">
-          <span>Contacts</span>
-        </div>
-        <div class="list" id="contacts-list"></div>
-      </div>
-
-      <div class="sidebar-section">
-        <div class="sidebar-header">
-          <span>Discussions</span>
-          <button id="new-chat-btn" class="link-btn">+ Nouveau</button>
-        </div>
-        <div class="list" id="conv-list"></div>
-      </div>
-
-    </aside>
-
-    <!-- COLONNE DROITE : CHAT -->
-    <section class="chat">
-
-      <header class="chat-header">
-        <div class="chat-target">
-          <div class="chat-target-name" id="chat-target-name">Aucune conversation</div>
-          <div class="chat-target-sub" id="chat-target-sub">Sélectionne un contact ou crée une discussion</div>
-        </div>
-      </header>
-
-      <div class="chat-messages" id="messages-list"></div>
-
-      <form id="message-form" class="chat-input-row">
-        <input id="message-input" type="text" placeholder="Écris un message..." autocomplete="off" required>
-        <button type="submit" class="btn-primary">Envoyer</button>
-      </form>
-
-    </section>
-
-  </section>
-
-</main>
+</div>
 
 <script type="module" src="messages.js"></script>
-
 </body>
 </html>

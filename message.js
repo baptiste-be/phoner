@@ -1,4 +1,3 @@
-// messages.js
 import {
   checkAuth,
   logout,
@@ -16,250 +15,110 @@ import {
   markConversationRead
 } from "./app.js";
 
-const logoutBtn = document.getElementById("logout-btn");
 const contactsListEl = document.getElementById("contacts-list");
 const convListEl = document.getElementById("conv-list");
-const chatTargetNameEl = document.getElementById("chat-target-name");
-const chatTargetSubEl = document.getElementById("chat-target-sub");
+const chatTargetEl = document.getElementById("chat-target");
+const messagesEl = document.getElementById("messages-list");
 const form = document.getElementById("message-form");
 const input = document.getElementById("message-input");
-const messagesEl = document.getElementById("messages-list");
-const newChatBtn = document.getElementById("new-chat-btn");
 
 let currentUser = null;
 let myPhone = null;
-
 let currentConvId = null;
 let currentTargetPhone = null;
-let unsubscribeConv = null;
-let unsubscribeConvList = null;
-
-/* ---------- UI HELPERS ---------- */
-
-function setNoConversation() {
-  currentConvId = null;
-  currentTargetPhone = null;
-  chatTargetNameEl.textContent = "Aucune conversation";
-  chatTargetSubEl.textContent = "Sélectionne un contact ou crée une discussion";
-  messagesEl.innerHTML = "";
-}
-
-/* ---------- RENDER MESSAGES ---------- */
 
 function renderMessages(messages) {
   messagesEl.innerHTML = "";
-  messages.forEach((m) => {
+  messages.forEach(m => {
     const div = document.createElement("div");
-    const isMe = m.from === myPhone;
-    const isSystem = m.from === "SYSTEM";
-
-    div.className = "message-bubble " + (isMe ? "me" : "other");
-
-    const time = m.timestamp?.toDate
-      ? m.timestamp.toDate().toLocaleTimeString("fr-FR", {
-          hour: "2-digit",
-          minute: "2-digit"
-        })
-      : "";
-
-    div.innerHTML = `
-      <div>${m.text}</div>
-      <div class="message-meta">${isSystem ? "Système" : m.from} • ${time}</div>
-    `;
-
+    div.className = m.from === myPhone ? "msg me" : "msg other";
+    div.textContent = m.text;
     messagesEl.appendChild(div);
   });
-
-  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-/* ---------- RENDER CONVERSATIONS LIST ---------- */
+async function openConversation(number) {
+  currentTargetPhone = number;
+  chatTargetEl.textContent = number;
 
-function renderConversationsList(convs) {
-  convListEl.innerHTML = "";
-  convs.forEach((c) => {
-    const div = document.createElement("div");
-    div.className = "list-item" + (c.conversationId === currentConvId ? " active" : "");
+  const targetUser = await getUserByPhoneNumber(number);
+  let convId;
 
-    const badge = c.unread ? `<span class="badge">●</span>` : "";
-
-    const time = c.lastTimestamp?.toDate
-      ? c.lastTimestamp.toDate().toLocaleTimeString("fr-FR", {
-          hour: "2-digit",
-          minute: "2-digit"
-        })
-      : "";
-
-    div.innerHTML = `
-      <div class="item-main">
-        <div class="item-title">${c.otherPhone} ${badge}</div>
-        <div class="item-sub">${c.lastMessage || ""}</div>
-      </div>
-      <div class="item-meta">${time}</div>
-    `;
-
-    div.addEventListener("click", () => {
-      openConversation(c.otherPhone, c.conversationId);
+  if (!targetUser) {
+    convId = await getOrCreateConversation(myPhone, number);
+    await addDoc(collection(db, "conversations", convId, "messages"), {
+      from: "SYSTEM",
+      text: "Numéro non attribué",
+      timestamp: serverTimestamp()
     });
+  } else {
+    convId = await getOrCreateConversation(myPhone, targetUser.phoneNumber);
+  }
 
-    convListEl.appendChild(div);
+  currentConvId = convId;
+
+  const q = query(
+    collection(db, "conversations", convId, "messages"),
+    orderBy("timestamp", "asc")
+  );
+
+  onSnapshot(q, snap => {
+    const msgs = [];
+    snap.forEach(d => msgs.push(d.data()));
+    renderMessages(msgs);
   });
 }
 
-/* ---------- LOAD CONTACTS ---------- */
-
 async function loadContacts() {
-  const colRef = collection(db, "contacts", currentUser.uid, "list");
-  const snap = await getDocs(colRef);
-
+  const snap = await getDocs(collection(db, "contacts", currentUser.uid, "list"));
   contactsListEl.innerHTML = "";
-
-  snap.forEach((docSnap) => {
-    const c = docSnap.data();
-
+  snap.forEach(doc => {
+    const c = doc.data();
     const div = document.createElement("div");
-    div.className = "list-item";
-
-    div.innerHTML = `
-      <div class="item-main">
-        <div class="item-title">${c.name || "Contact"}</div>
-        <div class="item-sub">${c.number}</div>
-      </div>
-    `;
-
-    div.addEventListener("click", () => {
-      openConversation(c.number);
-    });
-
+    div.className = "item";
+    div.textContent = `${c.name} (${c.number})`;
+    div.onclick = () => openConversation(c.number);
     contactsListEl.appendChild(div);
   });
 }
 
-/* ---------- SUBSCRIPTIONS ---------- */
+async function loadConversations() {
+  const q = query(
+    collection(db, "userConversations", currentUser.uid, "list"),
+    orderBy("lastTimestamp", "desc")
+  );
 
-function subscribeToConversation(convId) {
-  if (unsubscribeConv) unsubscribeConv();
-
-  const colRef = collection(db, "conversations", convId, "messages");
-  const q = query(colRef, orderBy("timestamp", "asc"));
-
-  unsubscribeConv = onSnapshot(q, async (snap) => {
-    const messages = [];
-    snap.forEach((docSnap) => messages.push(docSnap.data()));
-    renderMessages(messages);
-
-    await markConversationRead(currentUser.uid, convId);
+  onSnapshot(q, snap => {
+    convListEl.innerHTML = "";
+    snap.forEach(doc => {
+      const c = doc.data();
+      const div = document.createElement("div");
+      div.className = "item";
+      div.textContent = `${c.otherPhone} : ${c.lastMessage}`;
+      div.onclick = () => openConversation(c.otherPhone);
+      convListEl.appendChild(div);
+    });
   });
 }
 
-function subscribeToConversationList() {
-  if (unsubscribeConvList) unsubscribeConvList();
-
-  const colRef = collection(db, "userConversations", currentUser.uid, "list");
-  const q = query(colRef, orderBy("lastTimestamp", "desc"));
-
-  unsubscribeConvList = onSnapshot(q, (snap) => {
-    const convs = [];
-    snap.forEach((docSnap) => convs.push({ id: docSnap.id, ...docSnap.data() }));
-    renderConversationsList(convs);
-  });
-}
-
-/* ---------- OPEN CONVERSATION ---------- */
-
-async function openConversation(otherPhone, convId = null) {
-  currentTargetPhone = otherPhone;
-  chatTargetNameEl.textContent = otherPhone;
-  chatTargetSubEl.textContent = "Conversation active";
-
-  if (!convId) {
-    const targetUser = await getUserByPhoneNumber(otherPhone);
-
-    if (!targetUser) {
-      convId = await getOrCreateConversation(myPhone, otherPhone);
-
-      const colRef = collection(db, "conversations", convId, "messages");
-      await addDoc(colRef, {
-        from: "SYSTEM",
-        text: "Le numéro que vous essayez de joindre n'est pas attribué.",
-        timestamp: serverTimestamp()
-      });
-
-      await updateUserConversation(currentUser.uid, myPhone, otherPhone, convId, "Numéro non attribué", false);
-    } else {
-      convId = await getOrCreateConversation(myPhone, targetUser.phoneNumber);
-
-      await updateUserConversation(currentUser.uid, myPhone, targetUser.phoneNumber, convId, "Conversation ouverte", false);
-      await updateUserConversation(targetUser.uid, targetUser.phoneNumber, myPhone, convId, "Conversation ouverte", true);
-    }
-  }
-
-  currentConvId = convId;
-  subscribeToConversation(convId);
-}
-
-/* ---------- SEND MESSAGE ---------- */
-
-async function sendMessage() {
-  const text = input.value.trim();
-  if (!text || !currentTargetPhone) return;
-
-  const targetUser = await getUserByPhoneNumber(currentTargetPhone);
-  let convId;
-
-  if (!targetUser) {
-    convId = await getOrCreateConversation(myPhone, currentTargetPhone);
-
-    const colRef = collection(db, "conversations", convId, "messages");
-    await addDoc(colRef, {
-      from: "SYSTEM",
-      text: "Le numéro que vous essayez de joindre n'est pas attribué.",
-      timestamp: serverTimestamp()
-    });
-
-    await updateUserConversation(currentUser.uid, myPhone, currentTargetPhone, convId, "Numéro non attribué", false);
-  } else {
-    convId = await getOrCreateConversation(myPhone, targetUser.phoneNumber);
-
-    const colRef = collection(db, "conversations", convId, "messages");
-    await addDoc(colRef, {
-      from: myPhone,
-      text,
-      timestamp: serverTimestamp()
-    });
-
-    await updateUserConversation(currentUser.uid, myPhone, targetUser.phoneNumber, convId, text, false);
-    await updateUserConversation(targetUser.uid, targetUser.phoneNumber, myPhone, convId, text, true);
-  }
-
-  currentConvId = convId;
-  subscribeToConversation(convId);
-  input.value = "";
-}
-
-/* ---------- NEW CHAT BUTTON ---------- */
-
-newChatBtn.addEventListener("click", async () => {
-  const number = prompt("Numéro Phone® du destinataire (XX-XX-XX-XX-XX) :");
-  if (!number) return;
-  openConversation(number);
-});
-
-/* ---------- EVENTS ---------- */
-
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async e => {
   e.preventDefault();
-  sendMessage();
+  const text = input.value.trim();
+  if (!text || !currentConvId) return;
+
+  await addDoc(collection(db, "conversations", currentConvId, "messages"), {
+    from: myPhone,
+    text,
+    timestamp: serverTimestamp()
+  });
+
+  input.value = "";
 });
-
-logoutBtn.addEventListener("click", () => logout());
-
-/* ---------- INIT ---------- */
 
 checkAuth().then(({ user, phoneNumber }) => {
   currentUser = user;
   myPhone = phoneNumber;
-  setNoConversation();
+
   loadContacts();
-  subscribeToConversationList();
+  loadConversations();
 });
