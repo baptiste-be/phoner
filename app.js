@@ -26,7 +26,7 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// CONFIG FIREBASE
+// CONFIG FIREBASE (la tienne)
 const firebaseConfig = {
   apiKey: "AIzaSyCJZ7do_9CSXrG2npc1DPi0F2mzmRUFuBw",
   authDomain: "phone-7b65b.firebaseapp.com",
@@ -41,7 +41,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// NUMÉRO Phone®
+// ---------- NUMÉRO Phone® ----------
 function hashUidToDigits(uid) {
   let out = "";
   for (let i = 0; i < uid.length && out.length < 10; i++) {
@@ -51,12 +51,12 @@ function hashUidToDigits(uid) {
   return out;
 }
 
-export async function generatePhoneNumber(uid) {
+async function generatePhoneNumber(uid) {
   const d = hashUidToDigits(uid);
   return `${d.slice(0, 2)}-${d.slice(2, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}-${d.slice(8, 10)}`;
 }
 
-export async function ensureUserPhone(user) {
+async function ensureUserPhone(user) {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
@@ -74,44 +74,27 @@ export async function ensureUserPhone(user) {
   return phone;
 }
 
-// AUTH
-export function checkAuth(redirect = true) {
+// ---------- AUTH ----------
+export function checkAuth() {
   return new Promise(resolve => {
     onAuthStateChanged(auth, async user => {
-      if (!user && redirect) {
-        window.location.href = "login.html";
-        return;
-      }
-      if (user) {
+      if (!user) {
+        // pour tester vite : on crée un compte auto si pas connecté
+        const email = `test${Math.floor(Math.random() * 100000)}@mail.com`;
+        const password = "password123";
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const phone = await ensureUserPhone(cred.user);
+        resolve({ user: cred.user, phoneNumber: phone });
+      } else {
         const phone = await ensureUserPhone(user);
         resolve({ user, phoneNumber: phone });
-      } else {
-        resolve({ user: null, phoneNumber: null });
       }
     });
   });
 }
 
-export async function submitForm(mode, email, password, setError) {
-  try {
-    let cred;
-    if (mode === "login") {
-      cred = await signInWithEmailAndPassword(auth, email, password);
-    } else {
-      cred = await createUserWithEmailAndPassword(auth, email, password);
-      await ensureUserPhone(cred.user);
-    }
-    window.location.href = "index.html";
-  } catch (err) {
-    console.error(err);
-    if (setError) setError(err.message);
-  }
-}
-
 export function logout() {
-  return signOut(auth).then(() => {
-    window.location.href = "login.html";
-  });
+  return signOut(auth);
 }
 
 // Récupérer un user par numéro Phone®
