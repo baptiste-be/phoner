@@ -26,9 +26,7 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ----------------------
 // CONFIG FIREBASE
-// ----------------------
 const firebaseConfig = {
   apiKey: "AIzaSyCJZ7do_9CSXrG2npc1DPi0F2mzmRUFuBw",
   authDomain: "phone-7b65b.firebaseapp.com",
@@ -43,9 +41,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ----------------------
-// NUMÉRO PHONE®
-// ----------------------
+// NUMÉRO Phone®
 function hashUidToDigits(uid) {
   let out = "";
   for (let i = 0; i < uid.length && out.length < 10; i++) {
@@ -57,7 +53,7 @@ function hashUidToDigits(uid) {
 
 export async function generatePhoneNumber(uid) {
   const d = hashUidToDigits(uid);
-  return `${d.slice(0,2)}-${d.slice(2,4)}-${d.slice(4,6)}-${d.slice(6,8)}-${d.slice(8,10)}`;
+  return `${d.slice(0, 2)}-${d.slice(2, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}-${d.slice(8, 10)}`;
 }
 
 export async function ensureUserPhone(user) {
@@ -78,9 +74,7 @@ export async function ensureUserPhone(user) {
   return phone;
 }
 
-// ----------------------
 // AUTH
-// ----------------------
 export function checkAuth(redirect = true) {
   return new Promise(resolve => {
     onAuthStateChanged(auth, async user => {
@@ -109,7 +103,8 @@ export async function submitForm(mode, email, password, setError) {
     }
     window.location.href = "index.html";
   } catch (err) {
-    setError(err.message);
+    console.error(err);
+    if (setError) setError(err.message);
   }
 }
 
@@ -119,9 +114,39 @@ export function logout() {
   });
 }
 
-// ----------------------
-// EXPORT FIRESTORE
-// ----------------------
+// UTILISATEUR PAR NUMÉRO Phone®
+export async function getUserByPhoneNumber(phoneNumber) {
+  const qUsers = query(collection(db, "users"), where("phoneNumber", "==", phoneNumber));
+  const snap = await getDocs(qUsers);
+  if (snap.empty) return null;
+  const docSnap = snap.docs[0];
+  return { uid: docSnap.id, ...docSnap.data() };
+}
+
+// CONVERSATION ENTRE DEUX NUMÉROS
+export async function getOrCreateConversation(phoneA, phoneB) {
+  const convRef = collection(db, "conversations");
+  const qConv = query(
+    convRef,
+    where("participants", "in", [
+      [phoneA, phoneB],
+      [phoneB, phoneA]
+    ])
+  );
+
+  const snap = await getDocs(qConv);
+  if (!snap.empty) {
+    return snap.docs[0].id;
+  }
+
+  const newConv = await addDoc(convRef, {
+    participants: [phoneA, phoneB]
+  });
+
+  return newConv.id;
+}
+
+
 export {
   auth,
   db,

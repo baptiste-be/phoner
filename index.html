@@ -46,11 +46,11 @@
   </main>
 
   <script type="module">
-    import { checkAuth, logout } from './app.js';
+    import { checkAuth, logout } from "./app.js";
 
-    const emailSpan = document.getElementById('user-email');
-    const phoneSpan = document.getElementById('user-phone');
-    const logoutBtn = document.getElementById('logout-btn');
+    const emailSpan = document.getElementById("user-email");
+    const phoneSpan = document.getElementById("user-phone");
+    const logoutBtn = document.getElementById("logout-btn");
 
     checkAuth(true).then(({ user, phoneNumber }) => {
       if (user) {
@@ -59,7 +59,7 @@
       }
     });
 
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener("click", () => {
       logout();
     });
   </script>

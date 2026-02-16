@@ -5,19 +5,18 @@ import {
   db,
   collection,
   addDoc,
-  getDocs,
-  doc
-} from './app.js';
+  getDocs
+} from "./app.js";
 
-const logoutBtn = document.getElementById('logout-btn');
-const form = document.getElementById('contact-form');
-const nameInput = document.getElementById('contact-name');
-const numberInput = document.getElementById('contact-number');
-const listEl = document.getElementById('contacts-list');
+const logoutBtn = document.getElementById("logout-btn");
+const form = document.getElementById("contact-form");
+const nameInput = document.getElementById("contact-name");
+const numberInput = document.getElementById("contact-number");
+const listEl = document.getElementById("contacts-list");
 
 let currentUser = null;
 
-logoutBtn.addEventListener('click', () => logout());
+logoutBtn.addEventListener("click", () => logout());
 
 async function addContact() {
   const name = nameInput.value.trim();
@@ -26,6 +25,7 @@ async function addContact() {
 
   const colRef = collection(db, "contacts", currentUser.uid, "list");
   await addDoc(colRef, { name, number });
+
   nameInput.value = "";
   numberInput.value = "";
   await loadContacts();
@@ -38,7 +38,7 @@ async function loadContacts() {
   const snap = await getDocs(colRef);
   snap.forEach((docSnap) => {
     const data = docSnap.data();
-    const item = document.createElement('div');
+    const item = document.createElement("div");
     item.className = "contact-item";
     item.innerHTML = `
       <div class="contact-main">
@@ -50,7 +50,7 @@ async function loadContacts() {
   });
 }
 
-form.addEventListener('submit', (e) => {
+form.addEventListener("submit", (e) => {
   e.preventDefault();
   addContact();
 });

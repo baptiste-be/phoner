@@ -18,9 +18,16 @@
   <main class="app-shell">
     <section class="card chat-wrapper">
       <div class="card-header">
-        <div class="card-title">Chat global</div>
+        <div class="card-title">Discussion par numéro Phone®</div>
       </div>
+
+      <form id="target-form" style="margin-bottom:8px; display:flex; gap:8px;">
+        <input id="target-number" type="text" placeholder="Numéro Phone® (XX-XX-XX-XX-XX)" required>
+        <button class="btn btn-ghost" type="submit">Ouvrir</button>
+      </form>
+
       <div class="chat-messages" id="messages-list"></div>
+
       <form id="message-form" class="chat-input-row">
         <input id="message-input" type="text" placeholder="Écris un message..." autocomplete="off" required>
         <button type="submit" class="btn btn-primary">Envoyer</button>
