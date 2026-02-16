@@ -9,43 +9,48 @@
 
 <body>
 
-  <header>
-    <div class="brand">
-      <span class="brand-title">Phone®</span>
-      <span class="brand-sub">Messagerie</span>
+<header>
+  <div class="brand">
+    <span class="brand-title">Phone®</span>
+    <span class="brand-sub">Messagerie</span>
+  </div>
+  <button class="logout-btn" id="logout-btn">Déconnexion</button>
+</header>
+
+<main class="app-shell">
+
+  <section class="messaging-layout">
+
+    <!-- LISTE DES DISCUSSIONS -->
+    <div class="conv-panel">
+      <div class="conv-header">
+        Discussions
+        <button id="new-chat-btn" style="float:right; background:none; border:none; color:#0095f6; cursor:pointer;">
+          + Nouveau
+        </button>
+      </div>
+      <div class="conv-list" id="conv-list"></div>
     </div>
-    <button class="logout-btn" id="logout-btn">Déconnexion</button>
-  </header>
 
-  <main class="app-shell">
-
-    <section class="messaging-layout">
-
-      <!-- LISTE DES DISCUSSIONS -->
-      <div class="conv-panel">
-        <div class="conv-header">Discussions</div>
-        <div class="conv-list" id="conv-list"></div>
+    <!-- CHAT -->
+    <div class="chat-panel">
+      <div class="chat-header">
+        Discussion avec : <span id="chat-target">Aucun</span>
       </div>
 
-      <!-- CHAT -->
-      <div class="chat-panel">
-        <div class="chat-header">
-          Discussion avec : <span id="chat-target">Aucun</span>
-        </div>
+      <div class="chat-messages" id="messages-list"></div>
 
-        <div class="chat-messages" id="messages-list"></div>
+      <form id="message-form" class="chat-input-row">
+        <input id="message-input" type="text" placeholder="Écris un message..." autocomplete="off" required>
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+      </form>
+    </div>
 
-        <form id="message-form" class="chat-input-row">
-          <input id="message-input" type="text" placeholder="Écris un message..." autocomplete="off" required>
-          <button type="submit" class="btn btn-primary">Envoyer</button>
-        </form>
-      </div>
+  </section>
 
-    </section>
+</main>
 
-  </main>
-
-  <script type="module" src="messages.js"></script>
+<script type="module" src="messages.js"></script>
 
 </body>
 </html>

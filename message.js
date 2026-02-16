@@ -21,6 +21,7 @@ const chatTargetEl = document.getElementById("chat-target");
 const form = document.getElementById("message-form");
 const input = document.getElementById("message-input");
 const messagesEl = document.getElementById("messages-list");
+const newChatBtn = document.getElementById("new-chat-btn");
 
 let currentUser = null;
 let myPhone = null;
@@ -197,6 +198,15 @@ async function sendMessage() {
   subscribeToConversation(convId);
   input.value = "";
 }
+
+/* -----------------------------
+   NEW CHAT BUTTON
+----------------------------- */
+newChatBtn.addEventListener("click", async () => {
+  const number = prompt("Numéro Phone® du destinataire (XX-XX-XX-XX-XX) :");
+  if (!number) return;
+  openConversation(number);
+});
 
 /* -----------------------------
    EVENTS
