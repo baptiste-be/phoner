@@ -2,6 +2,7 @@
 import {
   initializeApp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
 import {
   getAuth,
   onAuthStateChanged,
@@ -9,6 +10,7 @@ import {
   createUserWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
 import {
   getFirestore,
   collection,
@@ -24,7 +26,9 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// ----------------------
+// CONFIG FIREBASE
+// ----------------------
 const firebaseConfig = {
   apiKey: "AIzaSyCJZ7do_9CSXrG2npc1DPi0F2mzmRUFuBw",
   authDomain: "phone-7b65b.firebaseapp.com",
@@ -39,46 +43,54 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// ----------------------
+// NUMÉRO PHONE®
+// ----------------------
 function hashUidToDigits(uid) {
-  let acc = "";
-  for (let i = 0; i < uid.length && acc.length < 10; i++) {
-    const code = uid.charCodeAt(i);
-    acc += (code % 10).toString();
+  let out = "";
+  for (let i = 0; i < uid.length && out.length < 10; i++) {
+    out += (uid.charCodeAt(i) % 10).toString();
   }
-  while (acc.length < 10) acc += "0";
-  return acc;
+  while (out.length < 10) out += "0";
+  return out;
 }
 
 export async function generatePhoneNumber(uid) {
-  const digits = hashUidToDigits(uid);
-  return `${digits.slice(0, 2)}-${digits.slice(2, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}-${digits.slice(8, 10)}`;
+  const d = hashUidToDigits(uid);
+  return `${d.slice(0,2)}-${d.slice(2,4)}-${d.slice(4,6)}-${d.slice(6,8)}-${d.slice(8,10)}`;
 }
 
 export async function ensureUserPhone(user) {
-  const userRef = doc(db, "users", user.uid);
-  const snap = await getDoc(userRef);
-  if (snap.exists()) {
-    const data = snap.data();
-    if (data.phoneNumber) return data.phoneNumber;
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if (snap.exists() && snap.data().phoneNumber) {
+    return snap.data().phoneNumber;
   }
-  const phoneNumber = await generatePhoneNumber(user.uid);
-  await setDoc(userRef, {
+
+  const phone = await generatePhoneNumber(user.uid);
+
+  await setDoc(ref, {
     email: user.email,
-    phoneNumber
+    phoneNumber: phone
   }, { merge: true });
-  return phoneNumber;
+
+  return phone;
 }
 
-export function checkAuth(redirectIfNoUser = true) {
-  return new Promise((resolve) => {
-    onAuthStateChanged(auth, async (user) => {
-      if (!user && redirectIfNoUser) {
+// ----------------------
+// AUTH
+// ----------------------
+export function checkAuth(redirect = true) {
+  return new Promise(resolve => {
+    onAuthStateChanged(auth, async user => {
+      if (!user && redirect) {
         window.location.href = "login.html";
         return;
       }
       if (user) {
-        const phoneNumber = await ensureUserPhone(user);
-        resolve({ user, phoneNumber });
+        const phone = await ensureUserPhone(user);
+        resolve({ user, phoneNumber: phone });
       } else {
         resolve({ user: null, phoneNumber: null });
       }
@@ -96,9 +108,8 @@ export async function submitForm(mode, email, password, setError) {
       await ensureUserPhone(cred.user);
     }
     window.location.href = "index.html";
-  } catch (e) {
-    console.error(e);
-    if (setError) setError(e.message);
+  } catch (err) {
+    setError(err.message);
   }
 }
 
@@ -108,7 +119,9 @@ export function logout() {
   });
 }
 
-// Export Firestore helpers
+// ----------------------
+// EXPORT FIRESTORE
+// ----------------------
 export {
   auth,
   db,
