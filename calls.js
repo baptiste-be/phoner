@@ -6,16 +6,16 @@ import {
   collection,
   addDoc,
   serverTimestamp
-} from './app.js';
+} from "./app.js";
 
-const logoutBtn = document.getElementById('logout-btn');
-const form = document.getElementById('call-form');
-const numberInput = document.getElementById('call-number');
-const typeSelect = document.getElementById('call-type');
+const logoutBtn = document.getElementById("logout-btn");
+const form = document.getElementById("call-form");
+const numberInput = document.getElementById("call-number");
+const typeSelect = document.getElementById("call-type");
 
 let currentUser = null;
 
-logoutBtn.addEventListener('click', () => logout());
+logoutBtn.addEventListener("click", () => logout());
 
 async function saveCall() {
   if (!currentUser) return;
@@ -34,7 +34,7 @@ async function saveCall() {
   typeSelect.value = "entrant";
 }
 
-form.addEventListener('submit', (e) => {
+form.addEventListener("submit", (e) => {
   e.preventDefault();
   saveCall();
 });

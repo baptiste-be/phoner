@@ -7,14 +7,14 @@ import {
   onSnapshot,
   orderBy,
   query
-} from './app.js';
+} from "./app.js";
 
-const logoutBtn = document.getElementById('logout-btn');
-const listEl = document.getElementById('history-list');
+const logoutBtn = document.getElementById("logout-btn");
+const listEl = document.getElementById("history-list");
 
 let currentUser = null;
 
-logoutBtn.addEventListener('click', () => logout());
+logoutBtn.addEventListener("click", () => logout());
 
 function subscribeHistory() {
   const colRef = collection(db, "history", currentUser.uid, "calls");
@@ -23,7 +23,7 @@ function subscribeHistory() {
     listEl.innerHTML = "";
     snap.forEach((docSnap) => {
       const data = docSnap.data();
-      const div = document.createElement('div');
+      const div = document.createElement("div");
       div.className = "call-item";
       const time = data.timestamp?.toDate
         ? data.timestamp.toDate().toLocaleString("fr-FR", {

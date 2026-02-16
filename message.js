@@ -107,3 +107,29 @@ async function sendMessage() {
     const colRef = collection(db, "conversations", convId, "messages");
     await addDoc(colRef, {
       from: myPhone,
+      text,
+      timestamp: serverTimestamp()
+    });
+  }
+
+  currentConvId = convId;
+  subscribeToConversation(convId);
+  input.value = "";
+}
+
+targetForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const number = targetInput.value.trim();
+  if (!number) return;
+  openConversationWithNumber(number);
+});
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  sendMessage();
+});
+
+checkAuth(true).then(({ user, phoneNumber }) => {
+  currentUser = user;
+  myPhone = phoneNumber;
+});
