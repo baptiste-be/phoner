@@ -1,82 +1,51 @@
-// contacts.js
+import { addDoc, auth, checkAuth, collection, db, getDocs, query } from "./app.js";
 
-import {
-  auth,
-  db,
-  checkAuth,
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  where
-} from "./app.js";
-import { doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const contactForm = document.getElementById("contactForm");
+const contactList = document.getElementById("contactList");
+const phoneRegex = /^\d{2}-\d{2}-\d{2}-\d{2}-\d{2}$/;
 
-async function addContact() {
-  const nameInput = document.getElementById("contactName");
-  const numberInput = document.getElementById("contactNumber");
-  const errorBox = document.getElementById("contactError");
-
-  errorBox.textContent = "";
-
-  const name = nameInput.value.trim();
-  const number = numberInput.value.trim();
-
-  if (!name || !number) {
-    errorBox.textContent = "Nom et numéro requis.";
-    return;
-  }
-
-  const user = auth.currentUser;
-  if (!user) {
-    errorBox.textContent = "Utilisateur non connecté.";
-    return;
-  }
-
-  try {
-    const listCol = collection(db, "contacts", user.uid, "list");
-    await addDoc(listCol, {
-      name,
-      number
-    });
-
-    nameInput.value = "";
-    numberInput.value = "";
-    await loadContacts();
-  } catch (err) {
-    errorBox.textContent = err.message || "Erreur lors de l’ajout du contact.";
-  }
-}
-
-async function loadContacts() {
-  const listEl = document.getElementById("contactList");
-  listEl.innerHTML = "";
-
+export async function addContact() {
   const user = auth.currentUser;
   if (!user) return;
 
-  const listCol = collection(db, "contacts", user.uid, "list");
-  const snap = await getDocs(listCol);
+  const name = document.getElementById("contactName").value.trim();
+  const number = document.getElementById("contactNumber").value.trim();
 
-  snap.forEach((docSnap) => {
+  if (!name || !phoneRegex.test(number)) {
+    return;
+  }
+
+  await addDoc(collection(db, "contacts", user.uid, "list"), { name, number });
+  document.getElementById("contactName").value = "";
+  document.getElementById("contactNumber").value = "";
+  await loadContacts();
+}
+
+export async function loadContacts() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const q = query(collection(db, "contacts", user.uid, "list"));
+  const snapshot = await getDocs(q);
+
+  contactList.innerHTML = "";
+  if (snapshot.empty) {
+    contactList.innerHTML = "<li>Aucun contact.</li>";
+    return;
+  }
+
+  snapshot.forEach((docSnap) => {
     const data = docSnap.data();
     const li = document.createElement("li");
-    li.className = "list-item";
-    li.textContent = data.name + " - " + data.number;
-    listEl.appendChild(li);
+    li.innerHTML = `<strong>${data.name}</strong><br>${data.number}`;
+    contactList.appendChild(li);
   });
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await checkAuth();
+await checkAuth();
+await loadContacts();
 
-  const logoutBtn = document.getElementById("logoutBtn");
-  logoutBtn.addEventListener("click", () => {
-    import("./app.js").then(({ logout }) => logout());
-  });
-
-  const addContactBtn = document.getElementById("addContactBtn");
-  addContactBtn.addEventListener("click", addContact);
-
-  await loadContacts();
+contactForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await addContact();
 });
