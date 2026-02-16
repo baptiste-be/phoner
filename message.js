@@ -1,5 +1,4 @@
 // messages.js
-
 import {
   auth,
   db,
@@ -10,9 +9,7 @@ import {
   serverTimestamp,
   orderBy
 } from "./app.js";
-import {
-  query
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const CHAT_ID = "global";
 
@@ -46,6 +43,9 @@ function subscribeMessages() {
       const data = docSnap.data();
       const div = document.createElement("div");
       div.className = "message-item";
+      if (auth.currentUser && data.from === auth.currentUser.email) {
+        div.classList.add("me");
+      }
       const from = data.from || "Inconnu";
       const text = data.text || "";
       div.textContent = from + " : " + text;
