@@ -1,39 +1,57 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Phone - Appels</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header class="header">
-    <h1>Appels Phone</h1>
-    <nav class="header-nav">
-      <a href="index.html" class="menu-item">Accueil</a>
-      <button id="logoutBtn" class="btn-secondary">Déconnexion</button>
-    </nav>
-  </header>
+// calls.js
 
-  <main class="main">
-    <section class="form-section">
-      <h2>Enregistrer un appel</h2>
-      <div class="form-group">
-        <label for="callNumber">Numéro Phone</label>
-        <input id="callNumber" type="text" placeholder="00-00-00-00-00">
-      </div>
-      <div class="form-group">
-        <label for="callType">Type</label>
-        <select id="callType">
-          <option value="sortant">Sortant</option>
-          <option value="entrant">Entrant</option>
-        </select>
-      </div>
-      <div id="callError" class="error-box"></div>
-      <button id="callBtn" class="btn-primary">Enregistrer l’appel</button>
-    </section>
-  </main>
+import {
+  auth,
+  db,
+  checkAuth,
+  collection,
+  addDoc,
+  serverTimestamp
+} from "./app.js";
 
-  <script type="module" src="calls.js"></script>
-</body>
-</html>
+async function saveCall() {
+  const numberInput = document.getElementById("callNumber");
+  const typeSelect = document.getElementById("callType");
+  const errorBox = document.getElementById("callError");
+
+  errorBox.textContent = "";
+
+  const number = numberInput.value.trim();
+  const type = typeSelect.value;
+
+  if (!number) {
+    errorBox.textContent = "Numéro requis.";
+    return;
+  }
+
+  const user = auth.currentUser;
+  if (!user) {
+    errorBox.textContent = "Utilisateur non connecté.";
+    return;
+  }
+
+  try {
+    const callsCol = collection(db, "history", user.uid, "calls");
+    await addDoc(callsCol, {
+      number,
+      type,
+      timestamp: serverTimestamp()
+    });
+
+    numberInput.value = "";
+  } catch (err) {
+    errorBox.textContent = err.message || "Erreur lors de l’enregistrement de l’appel.";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await checkAuth();
+
+  const logoutBtn = document.getElementById("logoutBtn");
+  logoutBtn.addEventListener("click", () => {
+    import("./app.js").then(({ logout }) => logout());
+  });
+
+  const callBtn = document.getElementById("callBtn");
+  callBtn.addEventListener("click", saveCall);
+});
