@@ -1,29 +1,58 @@
-<div class="glass-card login-container">
-    <h2>Phone®</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Mot de passe">
-    <button onclick="handleAuth()">Valider</button>
-    <p id="toggle-text" onclick="toggleMode()">Pas de compte ? Créer un compte</p>
-</div>
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phone® · Connexion</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="page center-page">
+      <section class="glass card auth-card">
+        <h1 class="brand">Phone®</h1>
+        <h2 id="authTitle">Connexion</h2>
 
-<script type="module">
-    import { auth } from './app.js';
-    import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        <form id="authForm" class="stack">
+          <label>
+            Email
+            <input id="email" type="email" placeholder="nom@domaine.com" required />
+          </label>
 
-    let isLogin = true;
+          <label>
+            Mot de passe
+            <input id="password" type="password" minlength="6" required />
+          </label>
 
-    window.toggleMode = () => {
-        isLogin = !isLogin;
-        document.getElementById('toggle-text').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Se connecter";
-    }
+          <button id="submitBtn" type="submit" class="btn-primary">Se connecter</button>
+        </form>
 
-    window.handleAuth = async () => {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('password').value;
+        <button id="modeSwitch" type="button" class="btn-link">Pas encore de compte ? Créer un compte</button>
+        <p id="errorBox" class="error-box"></p>
+      </section>
+    </main>
+
+    <script type="module">
+      import { getCurrentMode, submitForm, toggleMode, normalizeError } from "./app.js";
+
+      const authForm = document.getElementById("authForm");
+      const modeSwitch = document.getElementById("modeSwitch");
+      const errorBox = document.getElementById("errorBox");
+
+      authForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        errorBox.textContent = "";
         try {
-            if(isLogin) await signInWithEmailAndPassword(auth, e, p);
-            else await createUserWithEmailAndPassword(auth, e, p);
-            window.location.href = "index.html";
-        } catch(err) { alert(err.message); }
-    }
-</script>
+          await submitForm(getCurrentMode());
+          window.location.href = "index.html";
+        } catch (error) {
+          errorBox.textContent = normalizeError(error);
+        }
+      });
+
+      modeSwitch.addEventListener("click", () => {
+        errorBox.textContent = "";
+        toggleMode();
+      });
+    </script>
+  </body>
+</html>
