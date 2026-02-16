@@ -1,49 +1,27 @@
-// history.js
+import { auth, checkAuth, collection, db, onSnapshot, orderBy, query } from "./app.js";
 
-import {
-  auth,
-  db,
-  checkAuth,
-  collection,
-  onSnapshot,
-  orderBy
-} from "./app.js";
-import {
-  query
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const historyList = document.getElementById("historyList");
 
-function subscribeHistory() {
-  const listEl = document.getElementById("historyList");
+export function subscribeHistory() {
   const user = auth.currentUser;
   if (!user) return;
 
-  const callsCol = collection(db, "history", user.uid, "calls");
-  const q = query(callsCol, orderBy("timestamp", "desc"));
+  const q = query(collection(db, "history", user.uid, "calls"), orderBy("timestamp", "desc"));
+  onSnapshot(q, (snapshot) => {
+    historyList.innerHTML = "";
+    if (snapshot.empty) {
+      historyList.innerHTML = "<li>Aucun appel enregistré.</li>";
+      return;
+    }
 
-  onSnapshot(q, (snap) => {
-    listEl.innerHTML = "";
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
+    snapshot.forEach((docSnap) => {
+      const call = docSnap.data();
       const li = document.createElement("li");
-      li.className = "list-item";
-      const type = data.type || "inconnu";
-      const number = data.number || "";
-      const date = data.timestamp?.toDate
-        ? data.timestamp.toDate().toLocaleString()
-        : "";
-      li.textContent = type.toUpperCase() + " - " + number + " - " + date;
-      listEl.appendChild(li);
+      li.innerHTML = `<strong>${call.type || "appel"}</strong> · ${call.number || "-"}`;
+      historyList.appendChild(li);
     });
   });
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await checkAuth();
-
-  const logoutBtn = document.getElementById("logoutBtn");
-  logoutBtn.addEventListener("click", () => {
-    import("./app.js").then(({ logout }) => logout());
-  });
-
-  subscribeHistory();
-});
+await checkAuth();
+subscribeHistory();
