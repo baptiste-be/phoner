@@ -1,58 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Phone® - Accueil</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phone®</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar glass">
+      <div>
+        <h1 class="brand">Phone®</h1>
+        <p class="muted">Accueil</p>
+      </div>
+      <button id="logoutBtn" class="btn-danger" type="button">Déconnexion</button>
+    </header>
 
-<body>
-  <header class="header">
-    <h1>Phone</h1>
-    <button id="logoutBtn" class="btn-secondary">Déconnexion</button>
-  </header>
+    <main class="page">
+      <section class="glass card">
+        <h2>Compte</h2>
+        <p><strong>Email :</strong> <span id="userEmail">...</span></p>
+        <p><strong>Numéro Phone® :</strong> <span id="userPhone">...</span></p>
+      </section>
 
-  <main class="main">
+      <section class="grid-nav">
+        <a class="glass nav-card" href="calls.html">Appels</a>
+        <a class="glass nav-card" href="contact.html">Contacts</a>
+        <a class="glass nav-card" href="message.html">Messages</a>
+        <a class="glass nav-card" href="history.html">Historique</a>
+      </section>
+    </main>
 
-    <section class="user-info">
-      <h2>Mon compte</h2>
-      <p id="myEmail"></p>
-      <p id="myPhoneNumber"></p>
-    </section>
+    <script type="module">
+      import { checkAuth, logout } from "./app.js";
 
-    <nav class="menu">
-      <a href="calls.html" class="menu-item">Appels</a>
-      <a href="contact.html" class="menu-item">Contacts</a>
-      <a href="message.html" class="menu-item">Messages</a>
-      <a href="history.html" class="menu-item">Historique</a>
-    </nav>
-
-    <section class="content">
-      <h2>Bienvenue sur Phone</h2>
-      <p>Sélectionne une section dans le menu.</p>
-    </section>
-
-  </main>
-
-  <script type="module">
-    import { checkAuth, logout, db } from "./app.js";
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    checkAuth().then(async (user) => {
-      const snap = await getDoc(doc(db, "users", user.uid));
-      const data = snap.data();
-
-      document.getElementById("myEmail").textContent =
-        "Email : " + user.email;
-
-      document.getElementById("myPhoneNumber").textContent =
-        "Numéro Phone : " + (data.phoneNumber || "Non attribué");
-    });
-
-    document.getElementById("logoutBtn").onclick = logout;
-  </script>
-
-</body>
+      await checkAuth();
+      document.getElementById("logoutBtn").addEventListener("click", logout);
+    </script>
+  </body>
 </html>
-
