@@ -1,57 +1,31 @@
-// calls.js
+import { addDoc, auth, checkAuth, collection, db, serverTimestamp } from "./app.js";
 
-import {
-  auth,
-  db,
-  checkAuth,
-  collection,
-  addDoc,
-  serverTimestamp
-} from "./app.js";
+const callForm = document.getElementById("callForm");
+const phoneRegex = /^\d{2}-\d{2}-\d{2}-\d{2}-\d{2}$/;
 
-async function saveCall() {
-  const numberInput = document.getElementById("callNumber");
-  const typeSelect = document.getElementById("callType");
-  const errorBox = document.getElementById("callError");
-
-  errorBox.textContent = "";
-
-  const number = numberInput.value.trim();
-  const type = typeSelect.value;
-
-  if (!number) {
-    errorBox.textContent = "Numéro requis.";
-    return;
-  }
-
+export async function saveCall() {
   const user = auth.currentUser;
-  if (!user) {
-    errorBox.textContent = "Utilisateur non connecté.";
+  if (!user) return;
+
+  const number = document.getElementById("callNumber").value.trim();
+  const type = document.getElementById("callType").value;
+
+  if (!phoneRegex.test(number)) {
     return;
   }
 
-  try {
-    const callsCol = collection(db, "history", user.uid, "calls");
-    await addDoc(callsCol, {
-      number,
-      type,
-      timestamp: serverTimestamp()
-    });
-
-    numberInput.value = "";
-  } catch (err) {
-    errorBox.textContent = err.message || "Erreur lors de l’enregistrement de l’appel.";
-  }
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-  await checkAuth();
-
-  const logoutBtn = document.getElementById("logoutBtn");
-  logoutBtn.addEventListener("click", () => {
-    import("./app.js").then(({ logout }) => logout());
+  await addDoc(collection(db, "history", user.uid, "calls"), {
+    number,
+    type,
+    timestamp: serverTimestamp()
   });
 
-  const callBtn = document.getElementById("callBtn");
-  callBtn.addEventListener("click", saveCall);
+  document.getElementById("callNumber").value = "";
+}
+
+await checkAuth();
+
+callForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await saveCall();
 });
